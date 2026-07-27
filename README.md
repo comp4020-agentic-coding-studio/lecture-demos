@@ -12,7 +12,8 @@ prototype template, then is worked in week by week through the semester.
 
 ## Follow along
 
-Clone the repository in Week 1, then start each lecture with:
+Clone the repository in Week 1. Before each later lecture, reset your copy to
+the projector's starting state:
 
 ```sh
 git fetch && git reset --hard origin/main
@@ -20,6 +21,19 @@ pnpm install
 pnpm dev
 ```
 
-Keep anything you want to retain from a “now you try” pause on your own branch.
+## The two pauses
+
+Every lecture stops twice for a five-minute “now you try” pause. Immediately
+before each pause, the convenor pushes the current demo state and a root-level
+`PAUSE.md`. Pull it, paste its prompt into your own agent, fill in any marked
+choice, make a prediction with a neighbour, and run it. Everyone begins with
+the same repository state; the different results are what the room discusses
+when the demo returns.
+
+`PAUSE.md` always holds the current prompt. It is overwritten for the second
+pause, while the earlier prompt remains in the commit history. Keep anything
+you want to retain from a pause on your own branch or worktree before the next
+lecture's reset.
+
 The demo uses the same Vite static stack and checks as the student starter;
 `pnpm check` verifies the local build, linting and tests.
