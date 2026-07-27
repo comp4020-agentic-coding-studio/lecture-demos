@@ -1,56 +1,25 @@
-# COMP4020 static prototype template
+# lecture-demos
 
-A starter template for static-site prototypes in **COMP4020 / COMP8020 Agentic
-Coding Studio**. The course provisions a repo from this template for each
-deliverable --- you don't create it yourself. The `new-week` course skill clones
-it for you; from there, build your prototype and deploy it to GitHub Pages.
+The live demo repo for the COMP4020/COMP8020 Agentic Coding Studio lectures
+(Semester 2, 2026, ANU). It begins as a fresh instance of the course's static
+prototype template, then is worked in week by week through the semester.
 
-## CI and Pages only turn on when you ship
+- the demo is pushed at the end of each beat, so `git pull` during a lecture
+  puts students on the exact state showing on the projector
+- the end of each week is tagged (`week-01` through `week-12`)
+- the history is never cleaned up: it is the honest record of what the agent
+  and convenor actually did
 
-Your repo starts private, and both CI jobs (`check` and `deploy`) are gated on
-it being public. While private, a push to `main` runs nothing in CI ---
-`pnpm check` (below) is your feedback loop until then. When you're ready, the
-course's `/ship` skill flips the repo public, turns on GitHub Pages, and
-dispatches the deploy for you; there's nothing to configure in the Pages
-settings yourself. From that point, every push to `main` builds and deploys, and
-the deploy step prints your live URL and checks it returns 200.
+## Follow along
 
-## What gets marked
-
-The deployed site is the deliverable, assessed live in Chrome at two fixed
-viewports --- see the course website's
-[assessment page](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/topics/assessment/#marking-environment)
-for the details.
-
-## Quick start
+Clone the repository in Week 1, then start each lecture with:
 
 ```sh
+git fetch && git reset --hard origin/main
 pnpm install
-pnpm dev        # local dev server
-pnpm check      # most of what CI runs (links, secrets, evidence and deploy are CI-only)
-pnpm build      # produce dist/ (what gets deployed)
-pnpm dlx linkinator ./dist --silent   # the links check, locally --- what CI runs pre-push
+pnpm dev
 ```
 
-## What's here
-
-- `index.html`, `styles.css`, `main.ts` --- a minimal starting site. Replace it.
-- `spec/` --- what the checks are for (`README.md`) and the shipped invariants
-  (`invariants.test.ts`); your own spec tests live alongside them.
-- `CLAUDE.md` --- orients your coding agent: what the checks mean and how to
-  work here. Yours to grow.
-- `PROCESS.md` --- a template for your process overview, showing the
-  cited-moment format. Replace it with your own; `pnpm check:evidence` verifies
-  your citations resolve.
-- `.github/workflows/checks.yml` --- the CI sensors that run on every push once
-  your repo is public, and the GitHub Pages deploy.
-- `.githooks/pre-commit` --- blocks any commit that contains something shaped
-  like an API key, so your COMP4020 key can't end up in a public repo. Installed
-  automatically by `pnpm install`.
-
-This template is SSG-agnostic: it's plain HTML/CSS/TypeScript on Vite, so you
-can add Astro, Eleventy, or any static generator later without changing how it
-deploys. TypeScript is the course default over plain JavaScript: the types are
-extra backpressure, and your agent feels it before you do.
-
-See the course site for how the checks map to each week of the course.
+Keep anything you want to retain from a “now you try” pause on your own branch.
+The demo uses the same Vite static stack and checks as the student starter;
+`pnpm check` verifies the local build, linting and tests.
