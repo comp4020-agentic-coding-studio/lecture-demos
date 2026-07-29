@@ -12,10 +12,9 @@ The checks in this directory come in two kinds:
 
 `invariants.test.ts` asserts things that are true of any good website, however
 you build it and whatever the week's brief asks: a navigation landmark, exactly
-one top-level heading, the marked intro region (`data-testid="intro"`), a
-document language, a real title, a mobile viewport, alt text on images. They run
-against the **built** site (`dist/`), so they check what actually ships. Keep
-them green; don't delete them.
+one top-level heading, a document language, a real title, a mobile viewport, and
+alt text on images. They run against the **built** site (`dist/`), so they check
+what actually ships. Keep them green; don't delete them.
 
 ## Your spec tests (yours to write)
 
