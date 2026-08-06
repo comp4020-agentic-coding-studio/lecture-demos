@@ -1,7 +1,5 @@
 import { type Cell, type Company, TOTAL, completable, reach } from "./dex";
 
-const COLUMNS = 16;
-
 // Resolve the scaffolding to non-nullable types at the point of lookup. A
 // `querySelector` + guard pair proves the element exists at runtime, but the
 // proof doesn't follow the binding into a function body, so every later use
@@ -25,6 +23,17 @@ function company(): Company {
     if (control.checked) return control.value as Company;
   }
   return "alone";
+}
+
+// The reason line reserves its height either way, so it holds a standing prompt
+// when nothing is picked: otherwise the reservation reads as a broken gap, and
+// on touch — where there is no hover to stumble into — nothing would suggest the
+// squares do anything at all.
+const HINT = "Pick a square to see why.";
+
+function hint(): void {
+  reason.textContent = HINT;
+  reason.dataset.hint = "true";
 }
 
 function label(cell: Cell): string {
@@ -65,33 +74,57 @@ function focusCell(i: number): void {
   next.focus();
 }
 
-const STEP: Record<string, number> = {
-  ArrowRight: 1,
-  ArrowLeft: -1,
-  ArrowDown: COLUMNS,
-  ArrowUp: -COLUMNS,
-};
+// The grid's width decides its column count, so ask the layout rather than
+// keeping a constant in step with the stylesheet. Read per keypress, so a
+// resize mid-interaction can't leave the arrow keys jumping the wrong distance.
+function columns(): number {
+  const tracks = getComputedStyle(grid).gridTemplateColumns;
+  return Math.max(1, tracks.split(/\s+/).filter(Boolean).length);
+}
+
+function step(key: string): number | null {
+  switch (key) {
+    case "ArrowRight":
+      return 1;
+    case "ArrowLeft":
+      return -1;
+    case "ArrowDown":
+      return columns();
+    case "ArrowUp":
+      return -columns();
+    default:
+      return null;
+  }
+}
 
 cells.forEach((button, i) => {
   const show = () => {
     const cell = reach(company())[i];
-    reason.textContent = cell ? label(cell) : "";
+    if (!cell) return;
+    reason.textContent = label(cell);
+    delete reason.dataset.hint;
   };
   button.addEventListener("focus", show);
   button.addEventListener("pointerenter", show);
   button.addEventListener("keydown", (event: KeyboardEvent) => {
-    const step = STEP[event.key];
-    if (step === undefined) return;
+    const distance = step(event.key);
+    if (distance === null) return;
     event.preventDefault();
-    focusCell(i + step);
+    focusCell(i + distance);
   });
 });
 
-grid.addEventListener("pointerleave", () => {
-  reason.textContent = "";
+grid.addEventListener("pointerleave", (event: PointerEvent) => {
+  // Touch fires pointerleave the moment the finger lifts, which would wipe the
+  // line the tap just filled. Only a real mouse leaving should clear it, and
+  // not while the keyboard is parked on a cell.
+  if (event.pointerType !== "mouse") return;
+  if (grid.contains(document.activeElement)) return;
+  hint();
 });
 
 for (const control of controls) control.addEventListener("change", paint);
 
 total.textContent = String(TOTAL);
+hint();
 paint();

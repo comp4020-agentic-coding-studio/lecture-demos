@@ -86,17 +86,16 @@ Desktop, opening state (alone, one cartridge):
 │   You cannot catch them all                                   │
 │   Red version. One cartridge. No friends.                     │
 │                                                               │
-│   Who you know:   (•) just me    ( ) + a friend with Blue     │
+│  ┌─ sticky ──────────────────────────────────────────────┐    │
+│  │ NNN of 151   Who you know:  (•) just me  ( ) + Blue   │    │
+│  │ ▸ Pick a square to see why.                           │    │
+│  └───────────────────────────────────────────────────────┘    │
 │                                                               │
-│   ■ ■ ■ ■ □ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■        ┌───────────────┐    │
-│   ■ ■ □ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ □ ■ ■        │   NNN / 151   │    │
-│   ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ■ ■ ■ ■ ■        │  you can get  │    │
-│   ■ □ ■ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ■        └───────────────┘    │
-│   ·  ·  ·  (10 rows × 16 = 151 cells)  ·  ·                   │
+│   ■ ■ ■ ■ □ ■ ■ ■ ■ ■ ■ □ ■ ■                                 │
+│   ■ ■ □ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ □                                 │
+│   ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ■ ■ ■                                 │
+│   ·  ·  (14 columns × 11 rows = 151 cells)  ·  ·              │
 │   ■ ■ ■ ■ ■ ■ □                                               │
-│                                                               │
-│   ▸ Gengar --- only evolves while being traded                │
-│     (this line follows focus and hover; empty until then)     │
 │                                                               │
 │   One closing line lands the point.                           │
 └───────────────────────────────────────────────────────────────┘
@@ -107,16 +106,15 @@ What the mechanic does --- the only thing that moves when the control changes:
 ```
    ( ) just me    (•) + a friend with Blue
 
-   ■ ■ ■ ■ ▣ ■ ■ ■ ■ ■ ■ ▣ ■ ■ ■ ■        ┌───────────────┐
-   ■ ■ ▣ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ▣ ■ ■        │   MMM / 151   │   MMM > NNN
-                                          └───────────────┘
+   ■ ■ ■ ■ ▣ ■ ■ ■ ■ ■ ■ ▣ ■ ■        ┌────────────────┐
+   ■ ■ ▣ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ▣        │  MMM of 151    │   135 → 150
+                                      └────────────────┘
    ▣ = just became obtainable        □ = still dark, still has a reason
 ```
 
-Phone. The grid is taller than the viewport, so the count cannot sit beside it
-and cannot scroll away --- if you toggle the control and the number is
-offscreen, the mechanic silently does nothing. The control and count ride
-together in a sticky bar:
+Phone. The grid is 19 rows here, far taller than the viewport, so everything
+that reacts to the grid has to sit above it and stay put --- a tally or a reason
+line placed after the grid would be offscreen at the moment it changed:
 
 ```
 ┌─ 390px ──────────┐
@@ -125,9 +123,10 @@ together in a sticky bar:
 │ Red version.     │
 │ One cartridge.   │
 ├──────────────────┤ ← sticky from here down
-│ ( ) me           │
-│ (•) + Blue friend│
-│      MMM / 151   │
+│ MMM of 151       │
+│ Who you know     │
+│ (•) me ( ) +Blue │
+│ ▸ reason / hint  │
 ├──────────────────┤
 │ ■ ■ ■ ■ □ ■ ■ ■  │
 │ ■ ■ □ ■ ■ ■ ■ ■  │
@@ -137,18 +136,32 @@ together in a sticky bar:
 │ (8 wide, 19 tall)│
 │ ■ ■ ■ ■ ■ ■ □    │
 ├──────────────────┤
-│ ▸ reason line    │
 │ closing line     │
 └──────────────────┘
 ```
 
-Two things the wireframe settled that the prose above had left vague:
+What the wireframe settled that the prose above had left vague:
 
-- the reason for a dark cell is a **line under the grid driven by focus**, not a
-  tooltip. Tooltips are hover-only, and the marking pass tabs through.
-- the count is **sticky on phone**, because a cause and its effect that can't
-  share a screen aren't legible as cause and effect. This is the one layout risk
-  worth spending effort on.
+- the reason for a dark cell is **driven by focus, not a tooltip**. Tooltips are
+  hover-only, and the marking pass tabs through.
+- the count is **sticky**, because a cause and its effect that can't share a
+  screen aren't legible as cause and effect. This was the one layout risk worth
+  spending effort on, and it was worth more than I budgeted.
+
+What building it then settled, each a version of that same risk I'd only
+half-followed:
+
+- the **reason line belongs in the sticky bar too**, not under the grid. I had
+  it below, which meant tapping a cell twelve rows down updated a line the
+  reader couldn't see. Same bug as the count, one step further along.
+- the reason line **reserves its height and holds a standing prompt** when
+  nothing is picked. Empty, the reservation reads as a broken gap; and on touch
+  there is no hover to stumble into, so without a prompt nothing suggests the
+  squares do anything at all.
+- **columns are fluid, not a count per breakpoint** (`auto-fill` on a 2.5rem
+  floor: 14 across on desktop, 8 on a phone, real touch targets throughout). The
+  arrow keys read the resulting count back out of the computed style, so a
+  resize mid-interaction can't leave them stepping the wrong distance.
 
 ## What I am not building
 
@@ -171,12 +184,32 @@ Any one of these would be a second idea wearing the first one's clothes.
 - keyboard reachable, and the grid survives a resize mid-interaction --- the
   marking pass does both, and a 151-cell grid is where that will bite
 
-## Open calls for you
+## Calls made
 
-- **the runner-up idea** was Tajiri's insect collecting as the origin of the
-  whole design. Same subject, softer mechanic, so I didn't take it. Say if you'd
-  rather.
-- **how many friends the control goes up to.** One is enough to make the
-  argument; two makes the ceiling exact. Two is a slightly bigger mechanic.
-- **whether the retro skin stays**, given it's the first thing I've marked as
-  cuttable.
+All three open questions went the smaller way:
+
+- **the idea stands.** The runner-up --- Tajiri's insect collecting as the
+  origin of the whole design --- stayed unbuilt. Same subject, softer mechanic.
+- **the control goes to one friend, not two.** One is enough to make the
+  argument, and it turns out to make it exactly: a single Blue cartridge carries
+  Blue's eleven exclusives _and_ makes the four trade evolutions possible, so
+  one control move takes 135 to 150 and leaves only Mew.
+- **the retro skin is cut.** It was the first thing marked cuttable and nothing
+  since has argued for it.
+
+## Where it got to
+
+Built and green: `dex-data.ts` (151 entries derived from PokeAPI, not recalled),
+`dex.ts` (pure `reach`/`completable`), the page, and `spec/dex.test.ts` pinning
+both counts and both blocked sets.
+
+Verified in a browser rather than inferred from a green suite, because
+`pnpm check` never executes `main.ts`: the bar stays pinned mid-scroll and the
+count moves 135 → 150 from down inside the grid; arrow keys step 8 at phone
+width and 14 at desktop, including across a resize with a cell still focused;
+one tab stop for all 151; and `pointerleave` no longer wipes the reason line on
+touch.
+
+Still true that nothing automated covers the DOM wiring --- the logic has tests,
+the page does not. That is the obvious next thing if this were being marked
+rather than demonstrated.
