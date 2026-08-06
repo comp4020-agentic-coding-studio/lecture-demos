@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COMP4020 lecture demos</title>
+    <title>You cannot catch them all</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -13,12 +13,41 @@
       </nav>
     </header>
     <main>
-      <h1>COMP4020 lecture demos</h1>
-      <p>
-        This is where the live demo gets built, one lecture at a time. Between
-        lectures the page sits at its baseline; each week is tagged
-        <code>week-01</code> through <code>week-12</code>.
+      <h1>You cannot catch them all</h1>
+      <p class="standfirst">
+        Red version. One cartridge. No friends. Here is every Pokémon you can
+        put in the Pokédex.
+      </p>
+
+      <div class="bar">
+        <fieldset>
+          <legend>Who you know</legend>
+          <label>
+            <input type="radio" name="company" value="alone" checked />
+            just me
+          </label>
+          <label>
+            <input type="radio" name="company" value="blue-friend" />
+            + a friend with Blue
+          </label>
+        </fieldset>
+        <p class="tally">
+          <output id="count" aria-live="polite">135</output>
+          <span class="of">of <span id="total">151</span></span>
+        </p>
+      </div>
+
+      <div id="grid" class="grid" role="group" aria-label="The 151"></div>
+      <p id="reason" class="reason" aria-hidden="true"></p>
+
+      <p class="kicker">
+        Sixteen were out of reach: eleven that only Blue had, four that only
+        evolve part-way through a trade, and Mew, which normal play never
+        offered at all. <em>Gotta catch 'em all</em> was the slogan for a
+        cartridge that shipped eleven short and four impossible. The gap wasn't
+        a bug in the product — it was the product.
       </p>
     </main>
+    <script type="module" src="./main.ts"></script>
   </body>
 </html>
