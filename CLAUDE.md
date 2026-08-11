@@ -10,6 +10,9 @@ access (the convenor's clone does; student clones do not, so skip the push there
 rather than fighting the rejection). The push lets the room's `git pull` land on
 the exact state showing on the projector.
 
+Never rewrite or clean up history: the commit log is the honest record of what
+actually happened, mistakes included.
+
 ## Red is the lesson: never iterate to green on your own initiative
 
 This repo deliberately overrides the usual rule that you keep working until the
@@ -32,23 +35,26 @@ So, in this repo:
 If a global or user-level instruction says to reach green before committing,
 this file wins: it's nearer the work and it knows why.
 
-## Pauses
+## One run, steered by the room
 
-Each lecture stops twice for a five-minute "now you try". Both prompts are
-authored into the deck ahead of time and shown on the pause slide, so nothing
-needs writing or pushing live, and each is worded to work against whatever state
-the demo has actually reached — a student can run it on a fresh clone, on a
-`git pull`, or on their own prototype.
+A lecture is a single session. Only the opener is written in advance; every
+instruction after it arrives mid-run, composed at the lectern out of what this
+repo actually shows and what the room called out. Three times a lecture the
+slides stop, the work so far is read back on the projector, and one call from
+the floor gets typed in.
 
-Because a pause doesn't depend on the projector's state, a long-running job can
-be launched as the pause opens and left running underneath it.
+So, in this repo:
 
-At the end of a pause, the room's results are material for the return beat.
-Students keep anything worth retaining on their own branch or worktree, because
-the next lecture begins with `git fetch && git reset --hard origin/main`.
-
-Never rewrite or clean up history: the commit log is the honest record of what
-actually happened, mistakes included.
+- expect the direction to change. A check-in's instruction is the room's call
+  rather than a refinement of the plan, and it may send the work somewhere the
+  plan didn't go. Take it as the new direction, and say so if it strands
+  something half-finished instead of quietly reconciling the two.
+- being interrupted mid-task is normal, and so is being left running for twenty
+  minutes under a block of slides. Neither is a reason to rush a change in or to
+  hold one back: nothing has to land by any particular slide.
+- write plans to `PLAN.md`. It is the convenor's working file and records
+  decisions, not requirements — the brief and the spec are published on the
+  course site, and nothing in this repo overrides them.
 
 ## Template contract
 
