@@ -21,20 +21,19 @@ pnpm install
 pnpm dev
 ```
 
-## The two pauses
+## Check-ins
 
-Every lecture stops twice for a five-minute “now you try” pause. The prompt is
-on the slide, usually with one blank for a choice of your own. Fill it in, make
-a prediction with a neighbour, and run it.
+Three times a lecture the slides stop and the room takes the demo over: what the
+agent has done gets read back on the projector, and one call from the floor is
+typed in and run. There is nothing to prepare and no blank to fill in — half a
+minute with the person next to you, then call it out.
 
-Each prompt is written to work whatever state the demo has reached, so you can
-run it against a fresh clone, against a `git pull`, or against your own
-prototype. If you do pull, everyone who pulled starts from the same state and
-runs the same prompt — and every agent does something different, which is what
-the room discusses when the demo returns.
+Following along pays off here. A `git pull` at a check-in puts you on the state
+showing on the projector, so you can give your own agent the same instruction
+from the same starting point and watch it do something different with it.
 
-Keep anything you want to retain from a pause on your own branch or worktree
-before the next lecture's reset.
+Keep anything you want to retain on your own branch or worktree before the next
+lecture's reset.
 
 The demo uses the same Vite static stack and checks as the student starter;
 `pnpm check` verifies the local build, linting and tests.
