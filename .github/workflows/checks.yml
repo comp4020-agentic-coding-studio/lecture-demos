@@ -37,7 +37,13 @@ jobs:
       - name: Build, lint, and run the spec
         run: pnpm check
       - name: Check internal links
-        run: pnpm dlx linkinator ./dist --silent
+        # Internal links only, matching the template this repo starts from.
+        # linkinator checks outbound links by default, so someone else's rate
+        # limiter or outage would redden a build with nothing wrong in it. The
+        # regex skips anything not on the local origin the built site is served
+        # from; both spellings are named because a bare `--skip "^https?://"`
+        # matches that origin too and passes having scanned zero links.
+        run: pnpm dlx linkinator ./dist --silent --skip "^https?://(?!localhost|127)"
       - name: Scan for committed secrets
         # Pinned, both halves: the SHA fixes the action's script, and `version`
         # fixes the scanner image, which otherwise floats on :latest. These two
