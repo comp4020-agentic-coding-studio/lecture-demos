@@ -1,0 +1,59 @@
+---
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import { relativeHref, ROUTES } from "../lib/site";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title} · MARKDOWN</title>
+  </head>
+  <body>
+    <div class="site">
+      <header class="site-header">
+        <div class="container">
+          <a class="wordmark" href={relativeHref(path, ROUTES.home)}>
+            <span class="wordmark-mark">MARKDOWN</span>
+            <span class="wordmark-tag">a Kmart Clearance redesign concept</span>
+          </a>
+          <Nav />
+        </div>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      <footer class="site-footer">
+        <div class="container">
+          <ul class="footer-links">
+            <li><a href={relativeHref(path, ROUTES.home)}>Home</a></li>
+            <li><a href={relativeHref(path, ROUTES.dealExplorer)}>Deal Explorer</a></li>
+            <li><a href={relativeHref(path, ROUTES.whyThisRedesign)}>Why this redesign</a></li>
+            <li><a href={relativeHref(path, ROUTES.findKmart)}>Find Kmart</a></li>
+            <li><a href="https://www.kmart.com.au/">kmart.com.au ↗</a></li>
+          </ul>
+          <p class="disclaimer">
+            <strong>Independent student redesign — not affiliated with Kmart Australia.</strong>
+            MARKDOWN is a coursework concept exploring an alternative Clearance browsing
+            experience. Product names and prices are grounded in screenshots of Kmart's own
+            official product pages (see <code>notes/sources.md</code> in the project repository);
+            no product data has been invented.
+          </p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

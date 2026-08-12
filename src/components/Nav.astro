@@ -1,0 +1,33 @@
+---
+import { relativeHref, siteBase, ROUTES, type Route } from "../lib/site";
+
+const base = siteBase();
+const path = Astro.url.pathname;
+
+const links = [
+  { route: ROUTES.home, label: "Home" },
+  { route: ROUTES.dealExplorer, label: "Deal Explorer" },
+  { route: ROUTES.whyThisRedesign, label: "Why this redesign" },
+  { route: ROUTES.findKmart, label: "Find Kmart" },
+];
+
+function isActive(route: Route): boolean {
+  const absolute = `${base}${route}`;
+  if (route === ROUTES.home) return path === absolute || path === `${absolute}index.html`;
+  return path.startsWith(absolute);
+}
+---
+
+<nav class="primary-nav" aria-label="Primary">
+  <ul>
+    {
+      links.map((link) => (
+        <li>
+          <a href={relativeHref(path, link.route)} aria-current={isActive(link.route) ? "page" : undefined}>
+            {link.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

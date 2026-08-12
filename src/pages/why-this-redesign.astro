@@ -1,0 +1,235 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getDeal } from "../data/products";
+import { formatPrice, formatPercentage } from "../lib/format";
+import { relativeHref, ROUTES } from "../lib/site";
+
+const pretzel = getDeal("43666515");
+const airFryer = getDeal("43624515");
+const path = Astro.url.pathname;
+
+const currentSort = ["Price: Low to high", "Price: High to low", "New", "Relevance"];
+const redesignSort = ["Biggest discount", "Biggest saving"];
+---
+
+<Layout
+  title="Why this redesign"
+  description="The grounded evidence behind MARKDOWN: what Kmart's own Clearance sort menu offers today, and why percentage discount and dollar saving need separate sort modes."
+>
+  <section class="section-tight">
+    <div class="container">
+      <p class="eyebrow">The reasoning, grounded</p>
+      <h1>Why this redesign</h1>
+      <p class="lede">
+        Everything below is drawn from a direct browser screenshot of Kmart's own live Clearance
+        range, plus the 11 grounded product pages used in the <a
+          href={relativeHref(path, ROUTES.dealExplorer)}>Deal Explorer</a
+        >. Nothing here is invented.
+      </p>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <h2>Current sorting vs. redesign sorting</h2>
+      <div class="compare-grid">
+        <div class="compare-col compare-current">
+          <p class="compare-label">Kmart Clearance today</p>
+          <ul>
+            {currentSort.map((option) => <li>{option}</li>)}
+          </ul>
+          <p class="compare-note">Confirmed by screenshot — no other sort option is offered.</p>
+        </div>
+        <div class="compare-col compare-redesign">
+          <p class="compare-label">MARKDOWN adds</p>
+          <ul>
+            {redesignSort.map((option) => <li>{option}</li>)}
+          </ul>
+          <p class="compare-note">
+            Computed from each product's own <code>originalPrice</code> and
+            <code>clearancePrice</code>, never hand-entered.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight scale-section">
+    <div class="container scale-grid">
+      <div class="scale-number" aria-hidden="true">10,000</div>
+      <div>
+        <h2>10,000 products, one sort axis</h2>
+        <blockquote>“1–60 of 10000 Products”</blockquote>
+        <p>
+          That count is Kmart's own, read directly off the live Clearance listing. With a
+          catalogue that size and only <em>price</em>, <em>recency</em>, or <em>relevance</em> to
+          sort by, a genuinely deep markdown has no way to surface itself — it's easy for it to
+          sit on page 40, buried among items that were already inexpensive. Sorting by markdown
+          strength instead turns that same catalogue into something worth skimming.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <h2>Percentage discount and dollar saving are different questions</h2>
+      <p class="lede">
+        Ranking the same 11 grounded products by percentage off, versus by dollars off, puts
+        different items first — using their real, screenshot-confirmed prices:
+      </p>
+
+      <div class="example-grid">
+        <article class="example-card">
+          <p class="compare-label">Sorted by biggest discount</p>
+          <h3>{pretzel.name}</h3>
+          <p class="example-stat">{formatPercentage(pretzel.discountPercentage)} off</p>
+          <p class="example-sub">
+            {formatPrice(pretzel.originalPrice)} → {formatPrice(pretzel.clearancePrice)}, saving only
+            {formatPrice(pretzel.savingAmount)}
+          </p>
+        </article>
+        <article class="example-card">
+          <p class="compare-label">Sorted by biggest saving</p>
+          <h3>{airFryer.name}</h3>
+          <p class="example-stat">{formatPrice(airFryer.savingAmount)} saved</p>
+          <p class="example-sub">
+            {formatPrice(airFryer.originalPrice)} → {formatPrice(airFryer.clearancePrice)}, only about
+            {formatPercentage(airFryer.discountPercentage)} off
+          </p>
+        </article>
+      </div>
+
+      <p>
+        Neither ordering is wrong — a deep percentage cut and a large dollar saving are both
+        genuine markdown strength, just answering different questions. Kmart's current sort menu
+        can express neither.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .compare-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (width >= 700px) {
+    .compare-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .compare-col {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    background: var(--paper-raised);
+  }
+
+  .compare-redesign {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .compare-label {
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin: 0 0 0.75rem;
+  }
+
+  .compare-col ul {
+    margin: 0 0 0.75rem;
+    padding-left: 1.1rem;
+  }
+
+  .compare-col li {
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+  }
+
+  .compare-note {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .scale-section {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .scale-section h2 {
+    color: var(--paper);
+  }
+
+  .scale-section blockquote {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    padding-left: 1rem;
+    border-left: 4px solid var(--accent);
+  }
+
+  .scale-grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  @media (width >= 800px) {
+    .scale-grid {
+      grid-template-columns: auto 1fr;
+    }
+  }
+
+  .scale-number {
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .example-grid {
+    display: grid;
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  @media (width >= 700px) {
+    .example-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .example-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    background: var(--paper-raised);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .example-card h3 {
+    margin: 0.25rem 0 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .example-stat {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent-ink);
+    margin: 0 0 0.25rem;
+  }
+
+  .example-sub {
+    color: var(--ink-soft);
+    margin: 0;
+  }
+</style>

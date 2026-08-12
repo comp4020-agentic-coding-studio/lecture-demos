@@ -1,0 +1,140 @@
+---
+import type { Deal } from "../lib/deals";
+import { departmentSlug } from "../lib/deals";
+import PriceTag from "./PriceTag.astro";
+import DiscountSticker from "./DiscountSticker.astro";
+
+interface Props {
+  deal: Deal;
+}
+
+const { deal } = Astro.props;
+const slug = departmentSlug(deal.department);
+const meterWidth = Math.min(100, Math.max(6, deal.discountPercentage));
+---
+
+<article
+  class={`deal-card dept-${slug}`}
+  data-deal
+  data-id={deal.id}
+  data-name={deal.name}
+  data-department={slug}
+  data-price={deal.clearancePrice}
+  data-discount={deal.discountPercentage}
+  data-saving={deal.savingAmount}
+  data-order={deal.sourceOrder}
+>
+  <div class="deal-card-top">
+    <p class="eyebrow deal-card-category">
+      {deal.category ? deal.department : "Category not recorded"}
+    </p>
+    <DiscountSticker percentage={deal.discountPercentage} />
+  </div>
+
+  <h3 class="deal-card-name">{deal.name}</h3>
+
+  <PriceTag
+    originalPrice={deal.originalPrice}
+    clearancePrice={deal.clearancePrice}
+    savingAmount={deal.savingAmount}
+  />
+
+  <div class="deal-meter" role="presentation">
+    <div class="deal-meter-fill" style={`width: ${meterWidth}%;`}></div>
+  </div>
+
+  <a class="deal-card-link" href={deal.officialUrl} target="_blank" rel="noopener">
+    View on kmart.com.au
+    <span aria-hidden="true">↗</span>
+    <span class="visually-hidden">(opens Kmart's official product page in a new tab)</span>
+  </a>
+</article>
+
+<style>
+  .deal-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.4rem;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .deal-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 6px;
+    background: var(--card-accent, var(--dept-other));
+  }
+
+  .dept-home {
+    --card-accent: var(--dept-home);
+  }
+
+  .dept-tech {
+    --card-accent: var(--dept-tech);
+  }
+
+  .dept-toys {
+    --card-accent: var(--dept-toys);
+  }
+
+  .dept-entertainment {
+    --card-accent: var(--dept-entertainment);
+  }
+
+  .dept-other {
+    --card-accent: var(--dept-other);
+  }
+
+  .deal-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .deal-card-category {
+    margin: 0.2rem 0 0;
+    color: var(--card-accent, var(--ink-soft));
+  }
+
+  .deal-card-name {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .deal-meter {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .deal-meter-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--card-accent, var(--accent)), var(--accent));
+  }
+
+  .deal-card-link {
+    margin-top: auto;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+  }
+
+  .deal-card-link:hover {
+    text-decoration: underline;
+  }
+</style>
