@@ -10,6 +10,22 @@ prototype template, then is worked in week by week through the semester.
 - the history is never cleaned up: it is the honest record of what the agent and
   convenor actually did
 
+## Two layers, two clocks
+
+The **artefact** — the site under `src/`, and whatever tests came with it — is
+replaced most weeks, and from Week 3 on it is usually vendored rather than
+written here: a hall-of-fame prototype from the previous crit, copied in whole
+from its public repo, so a lecture starts from something that already works
+instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
+`spec/`, the CI workflow and the build tooling — accumulates all semester.
+
+The artefact in the tree right now is
+[MARKDOWN](https://github.com/comp4020-agentic-coding-studio/comp4020-crit2-Astra-Erevos)
+(`00332bd`), an unsolicited redesign of Kmart Australia's clearance pages and a
+peer-voted pick from the C2 crits. It is here because it is good. Whatever the
+lecture does to it is a demonstration of the loop and says nothing about the
+work.
+
 ## Follow along
 
 Clone the repository in Week 1. Before each later lecture, reset your copy to
@@ -35,5 +51,7 @@ from the same starting point and watch it do something different with it.
 Keep anything you want to retain on your own branch or worktree before the next
 lecture's reset.
 
-The demo uses the same Vite static stack and checks as the student starter;
-`pnpm check` verifies the local build, linting and tests.
+The demo runs the same checks as the student starter: `pnpm check` covers the
+typecheck, the build, the linters and the tests. The stack underneath is
+whatever the current artefact brought with it — Astro, at the moment, on the
+template's tooling.

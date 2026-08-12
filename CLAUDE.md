@@ -56,10 +56,30 @@ So, in this repo:
   decisions, not requirements — the brief and the spec are published on the
   course site, and nothing in this repo overrides them.
 
+## The artefact is often someone else's work
+
+Most weeks the site in this repo was not written here. It is vendored: a
+hall-of-fame prototype from the previous crit, copied in from its public repo,
+credited in `README.md`, and then riffed on in front of the room. The artefact
+is replaced whole; the harness is what accumulates.
+
+So, in this repo:
+
+- **the vendored code is not a fault report.** It was voted a standout by the
+  people who watched it demoed, and it is the starting point because it works.
+  Don't audit it, don't tidy it, and don't narrate its shortcomings — change
+  only what the lecture asks for, and leave the rest exactly as it arrived.
+- **keep what came with it.** Its own spec tests, its notes and its attribution
+  all stay. The tests are free sensors covering contracts this repo still has to
+  honour, and a change that trips one is worth seeing rather than silencing.
+- **credit travels with the code.** When the artefact is replaced, update the
+  attribution in `README.md` in the same commit.
+
 ## Template contract
 
 Keep the starter's static-site contract intact unless a lecture explicitly
 demonstrates changing it: `pnpm build` emits the site to `dist/`, and
-`pnpm check` remains the quick local feedback loop. This repository is public,
-so a push also runs its GitHub Actions checks and deploys the site to GitHub
-Pages.
+`pnpm check` remains the quick local feedback loop. The stack underneath that
+contract is the artefact's business and can change when the artefact does. This
+repository is public, so a push also runs its GitHub Actions checks and deploys
+the site to GitHub Pages.

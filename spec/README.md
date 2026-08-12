@@ -21,6 +21,15 @@ one top-level heading, a document language, a real title, a mobile viewport, and
 alt text on images. They run against the **built** site (`dist/`), so they check
 what actually ships. Keep them green; don't delete them.
 
+## Tests the artefact brought with it
+
+When a week starts from a vendored prototype (see `README.md`), that repo's own
+spec tests come in with it — `crit-2.test.ts` here, written against the C2 spec
+by whoever built the prototype. They stay: they are free sensors, they cover
+contracts this site still has to honour, and one of them going red under a
+lecture's changes is exactly the sort of thing the room should watch happen.
+They go out with the artefact they came with, not before.
+
 ## The week's spec tests (written live)
 
 Turning the week's published spec into tests is your work, not the template's.
