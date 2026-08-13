@@ -1,25 +1,25 @@
 /* Design tokens ----------------------------------------------------- */
 :root {
-  --ink: #0d1b3d; /* navy, near-black */
-  --ink-soft: #4a5468;
-  --paper: #f7f9fc;
+  --ink: #23262b;
+  --ink-soft: #5c6066;
+  --paper: #fcfcfd;
   --paper-raised: #fff;
-  --line: #dde3ec;
-  --accent: #c8102e; /* markdown red: the "off" colour */
-  --accent-ink: #8c0a1e;
-  --accent-soft: #ffe0e4;
-  --save: #0b3d91; /* dollars-saved blue */
-  --save-soft: #dfe8ff;
-  --dept-home: #0b3d91;
-  --dept-tech: #2563eb;
-  --dept-toys: #e0323f;
-  --dept-entertainment: #7a1230;
-  --dept-other: #71717a;
+  --line: #e6e7ea;
+  --accent: #ffd4dd; /* blush: the "off" colour */
+  --accent-ink: var(--ink); /* no pastel is dark enough to set type in */
+  --accent-soft: #ffeaef;
+  --save: var(--ink);
+  --save-soft: #c7f0d8; /* mint */
+  --dept-home: #bfe3f7; /* sky */
+  --dept-tech: #e0ccf7; /* lilac */
+  --dept-toys: #fff3b0; /* butter */
+  --dept-entertainment: #ffd4dd; /* blush */
+  --dept-other: #c7f0d8; /* mint */
   --radius-sm: 8px;
   --radius: 16px;
   --radius-lg: 24px;
-  --shadow: 0 12px 30px -14px rgb(13 27 61 / 35%);
-  --shadow-sm: 0 4px 14px -8px rgb(13 27 61 / 30%);
+  --shadow: 0 12px 30px -14px rgb(35 38 43 / 35%);
+  --shadow-sm: 0 4px 14px -8px rgb(35 38 43 / 30%);
   --maxw: 76rem;
   --gutter: clamp(1.25rem, 4vw, 3rem);
   --focus: 3px solid var(--accent-ink);
@@ -76,7 +76,7 @@ a {
 }
 
 a:hover {
-  color: var(--accent);
+  background: var(--accent-soft);
 }
 
 :focus-visible {
@@ -297,13 +297,13 @@ main {
 
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--ink);
   box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
-  background: var(--accent-ink);
-  color: #fff;
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .btn-ghost {
