@@ -52,9 +52,11 @@ So, in this repo:
 - being interrupted mid-task is normal, and so is being left running for twenty
   minutes under a block of slides. Neither is a reason to rush a change in or to
   hold one back: nothing has to land by any particular slide.
-- write plans to `PLAN.md`. It is the convenor's working file and records
-  decisions, not requirements — the brief and the spec are published on the
-  course site, and nothing in this repo overrides them.
+- don't write a plan file, and don't ask for one. The convenor's planning lives
+  outside this repo on purpose: a plan committed here would tell you where the
+  run is supposed to end up, which is the one thing you shouldn't know. The
+  brief and the spec are published on the course site, and nothing in this repo
+  overrides them.
 
 ## The artefact is often someone else's work
 
