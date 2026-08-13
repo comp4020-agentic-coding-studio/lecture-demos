@@ -1,25 +1,25 @@
 /* Design tokens ----------------------------------------------------- */
 :root {
-  --ink: #171310;
-  --ink-soft: #4a433c;
-  --paper: #fff8ec;
+  --ink: #0d1b3d; /* navy, near-black */
+  --ink-soft: #4a5468;
+  --paper: #f7f9fc;
   --paper-raised: #fff;
-  --line: #e8dfcd;
-  --accent: #ff4d2e; /* markdown red-orange: the "off" colour */
-  --accent-ink: #7a1c0c;
-  --accent-soft: #ffe3d6;
-  --save: #0f7a6c; /* dollars-saved teal */
-  --save-soft: #d9efe9;
-  --dept-home: #0f7a6c;
-  --dept-tech: #3a3e8c;
-  --dept-toys: #d97706;
-  --dept-entertainment: #7b3fa0;
-  --dept-other: #57534e;
+  --line: #dde3ec;
+  --accent: #c8102e; /* markdown red: the "off" colour */
+  --accent-ink: #8c0a1e;
+  --accent-soft: #ffe0e4;
+  --save: #0b3d91; /* dollars-saved blue */
+  --save-soft: #dfe8ff;
+  --dept-home: #0b3d91;
+  --dept-tech: #2563eb;
+  --dept-toys: #e0323f;
+  --dept-entertainment: #7a1230;
+  --dept-other: #71717a;
   --radius-sm: 8px;
   --radius: 16px;
   --radius-lg: 24px;
-  --shadow: 0 12px 30px -14px rgb(23 19 16 / 35%);
-  --shadow-sm: 0 4px 14px -8px rgb(23 19 16 / 30%);
+  --shadow: 0 12px 30px -14px rgb(13 27 61 / 35%);
+  --shadow-sm: 0 4px 14px -8px rgb(13 27 61 / 30%);
   --maxw: 76rem;
   --gutter: clamp(1.25rem, 4vw, 3rem);
   --focus: 3px solid var(--accent-ink);
@@ -297,13 +297,13 @@ main {
 
 .btn-primary {
   background: var(--accent);
-  color: #fff8ec;
+  color: #fff;
   box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
   background: var(--accent-ink);
-  color: #fff8ec;
+  color: #fff;
 }
 
 .btn-ghost {
