@@ -26,8 +26,7 @@ So, in this repo:
   another approach, unless you're asked to.
 - commit and push red states when asked. A failing `pnpm check` or a red CI run
   is a legitimate thing to have on the projector.
-- run only the checks you're asked to run. Some sensors are held in reserve for
-  CI to find, and running one early locally spoils the beat it belongs to.
+- run only the checks you're asked to run, and say which ones you ran.
 - never delete or weaken a test to make a check pass. If a test has genuinely
   gone stale, say so and say why, then leave the call to the convenor — that
   judgement is the thing being taught.
@@ -39,9 +38,9 @@ this file wins: it's nearer the work and it knows why.
 
 A lecture is a single session. Only the opener is written in advance; every
 instruction after it arrives mid-run, composed at the lectern out of what this
-repo actually shows and what the room called out. Three times a lecture the
-slides stop, the work so far is read back on the projector, and one call from
-the floor gets typed in.
+repo actually shows and what the room called out. At points during the lecture
+the slides stop, the work so far is read back on the projector, and one call
+from the floor gets typed in.
 
 So, in this repo:
 
