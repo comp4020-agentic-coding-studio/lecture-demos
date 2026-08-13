@@ -4,8 +4,8 @@ The live demo repo for the COMP4020/COMP8020 Agentic Coding Studio lectures
 (Semester 2, 2026, ANU). It begins as a fresh instance of the course's static
 prototype template, then is worked in week by week through the semester.
 
-- the demo is pushed at the end of each beat, so `git pull` during a lecture
-  puts students on the exact state showing on the projector
+- the demo is committed beat by beat during the lecture and pushed afterwards,
+  so the history lands as it happened rather than tidied up
 - the end of each week is tagged (`week-01` through `week-12`)
 - the history is never cleaned up: it is the honest record of what the agent and
   convenor actually did
@@ -44,9 +44,11 @@ agent has done gets read back on the projector, and one call from the floor is
 typed in and run. There is nothing to prepare and no blank to fill in — half a
 minute with the person next to you, then call it out.
 
-Following along pays off here. A `git pull` at a check-in puts you on the state
-showing on the projector, so you can give your own agent the same instruction
-from the same starting point and watch it do something different with it.
+The run is pushed after the lecture rather than during it, so pulling
+mid-session won't track the projector — watch the screen instead. Afterwards, a
+pull gets you the whole run commit by commit, and you can hand your own agent
+the same instruction from the same starting point and watch it do something
+different with it.
 
 Keep anything you want to retain on your own branch or worktree before the next
 lecture's reset.

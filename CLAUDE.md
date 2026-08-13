@@ -5,10 +5,9 @@ course's static prototype template, then evolves in public during the semester.
 
 ## Demo beats
 
-At the end of every demo beat, commit. Then push — but only if you have write
-access (the convenor's clone does; student clones do not, so skip the push there
-rather than fighting the rejection). The push lets the room's `git pull` land on
-the exact state showing on the projector.
+At the end of every demo beat, commit. Don't push: the lecture runs off the
+local tree, and the convenor pushes the whole run once the session is over. A
+push mid-run is a deliberate step to be asked for, not a default.
 
 Never rewrite or clean up history: the commit log is the honest record of what
 actually happened, mistakes included.
