@@ -18,8 +18,18 @@ function isActive(route: Route): boolean {
 }
 ---
 
-<nav class="primary-nav" aria-label="Primary">
-  <ul>
+<nav class="primary-nav" id="primary-nav" aria-label="Primary">
+  <button
+    class="nav-toggle"
+    id="nav-toggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="primary-nav-menu"
+  >
+    <span class="nav-toggle-bars" aria-hidden="true"></span>
+    Menu
+  </button>
+  <ul id="primary-nav-menu">
     {
       links.map((link) => (
         <li>
@@ -31,3 +41,26 @@ function isActive(route: Route): boolean {
     }
   </ul>
 </nav>
+
+<script>
+  const nav = document.getElementById("primary-nav");
+  const toggle = document.getElementById("nav-toggle");
+
+  if (nav && toggle) {
+    // Collapse the menu only now that the script which can reopen it is running.
+    nav.dataset.collapsible = "";
+
+    const setExpanded = (expanded: boolean) =>
+      toggle.setAttribute("aria-expanded", String(expanded));
+
+    toggle.addEventListener("click", () => {
+      setExpanded(toggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || toggle.getAttribute("aria-expanded") !== "true") return;
+      setExpanded(false);
+      toggle.focus();
+    });
+  }
+</script>
