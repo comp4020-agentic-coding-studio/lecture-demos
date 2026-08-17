@@ -70,10 +70,10 @@ is replaced whole; the harness is what accumulates.
 
 So, in this repo:
 
-- **the vendored code is not a fault report.** It was voted a standout by the
-  people who watched it demoed, and it is the starting point because it works.
-  Don't audit it, don't tidy it, and don't narrate its shortcomings — change
-  only what the lecture asks for, and leave the rest exactly as it arrived.
+- **the vendored code is not a fault report.** It is one of this week's
+  hall-of-fame picks, and it is the starting point because it works. Don't audit
+  it, don't tidy it, and don't narrate its shortcomings — change only what the
+  lecture asks for, and leave the rest exactly as it arrived.
 - **keep what came with it.** Its own spec tests, its notes and its attribution
   all stay. The tests are free sensors covering contracts this repo still has to
   honour, and a change that trips one is worth seeing rather than silencing.

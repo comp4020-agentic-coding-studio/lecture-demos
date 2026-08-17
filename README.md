@@ -21,9 +21,9 @@ instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
 
 The artefact in the tree right now is
 [MARKDOWN](https://github.com/comp4020-agentic-coding-studio/comp4020-crit2-Astra-Erevos)
-(`00332bd`), an unsolicited redesign of Kmart Australia's clearance pages and a
-peer-voted pick from the C2 crits. It is here because it is good. Whatever the
-lecture does to it is a demonstration of the loop and says nothing about the
+(`00332bd`), an unsolicited redesign of Kmart Australia's clearance pages and
+one of this week's hall-of-fame picks. It is here because it is good. Whatever
+the lecture does to it is a demonstration of the loop and says nothing about the
 work.
 
 ## Follow along
