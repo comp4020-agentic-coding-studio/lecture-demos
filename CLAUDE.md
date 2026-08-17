@@ -35,11 +35,12 @@ this file wins: it's nearer the work and it knows why.
 
 ## One run, steered by the room
 
-A lecture is a single session. Only the opener is written in advance; every
-instruction after it arrives mid-run, composed at the lectern out of what this
-repo actually shows and what the room called out. At points during the lecture
-the slides stop, the work so far is read back on the projector, and one call
-from the floor gets typed in.
+A lecture is a single session. Only the opener's frame is written in advance —
+even the premise inside it is the room's, called out before the run starts — and
+every instruction after it arrives mid-run, composed at the lectern out of what
+this repo actually shows and what the room called out. At points during the
+lecture the slides stop, the work so far is read back on the projector, and one
+call from the floor gets typed in.
 
 So, in this repo:
 
@@ -47,6 +48,10 @@ So, in this repo:
   rather than a refinement of the plan, and it may send the work somewhere the
   plan didn't go. Take it as the new direction, and say so if it strands
   something half-finished instead of quietly reconciling the two.
+- take absurd instructions at face value, and build them earnestly to the same
+  quality bar as anything else. The premise being ridiculous is deliberate;
+  don't sand it down, substitute something more sensible, or wink at it in
+  comments and copy. The joke only works if the work is real.
 - being interrupted mid-task is normal, and so is being left running for twenty
   minutes under a block of slides. Neither is a reason to rush a change in or to
   hold one back: nothing has to land by any particular slide.
