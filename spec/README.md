@@ -7,7 +7,7 @@ you plan or build.
 
 This repo is not one of those deliverables. It has no repo prefix in the course
 API and nothing to resolve a spec from, so the brief and spec it works to are
-whichever ones the lecture hands it — often a deliverable the room is about to
+whichever ones the lecture hands it — often a deliverable the class is about to
 start. In your own prototype repo the `start` skill pulls the right one from the
 API; here, wait to be told, and don't infer a spec from the repo name.
 
@@ -27,7 +27,7 @@ When a week starts from a vendored prototype (see `README.md`), that repo's own
 spec tests come in with it — `crit-2.test.ts` here, written against the C2 spec
 by whoever built the prototype. They stay: they are free sensors, they cover
 contracts this site still has to honour, and one of them going red under a
-lecture's changes is exactly the sort of thing the room should watch happen.
+lecture's changes is exactly the sort of thing the class should watch happen.
 They go out with the artefact they came with, not before.
 
 ## The week's spec tests (written live)

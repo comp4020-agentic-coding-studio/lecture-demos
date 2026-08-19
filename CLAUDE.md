@@ -17,7 +17,7 @@ actually happened, mistakes included.
 This repo deliberately overrides the usual rule that you keep working until the
 checks pass and never commit a red state. Here the red **is** the teaching
 material: the lecture shows a check failing, the failure being read, and the
-failure being fixed — in that order, in front of a room.
+failure being fixed — in that order, in front of a class.
 
 So, in this repo:
 
@@ -33,18 +33,18 @@ So, in this repo:
 If a global or user-level instruction says to reach green before committing,
 this file wins: it's nearer the work and it knows why.
 
-## One run, steered by the room
+## One run, steered by the class
 
 A lecture is a single session. Only the opener's frame is written in advance —
-even the premise inside it is the room's, called out before the run starts — and
-every instruction after it arrives mid-run, composed at the lectern out of what
-this repo actually shows and what the room called out. At points during the
-lecture the slides stop, the work so far is read back on the projector, and one
-call from the floor gets typed in.
+even the premise inside it is the class's, called out before the run starts —
+and every instruction after it arrives mid-run, composed at the lectern out of
+what this repo actually shows and what the class called out. At points during
+the lecture the slides stop, the work so far is read back on the projector, and
+one call from the class gets typed in.
 
 So, in this repo:
 
-- expect the direction to change. A check-in's instruction is the room's call
+- expect the direction to change. A check-in's instruction is the class's call
   rather than a refinement of the plan, and it may send the work somewhere the
   plan didn't go. Take it as the new direction, and say so if it strands
   something half-finished instead of quietly reconciling the two.
@@ -65,7 +65,7 @@ So, in this repo:
 
 Most weeks the site in this repo was not written here. It is vendored: a
 hall-of-fame prototype from the previous crit, copied in from its public repo,
-credited in `README.md`, and then riffed on in front of the room. The artefact
+credited in `README.md`, and then riffed on in front of the class. The artefact
 is replaced whole; the harness is what accumulates.
 
 So, in this repo:
