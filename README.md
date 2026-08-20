@@ -19,12 +19,12 @@ from its public repo, so a lecture starts from something that already works
 instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
 `spec/`, the CI workflow and the build tooling — accumulates all semester.
 
-The artefact in the tree right now is
-[MARKDOWN](https://github.com/comp4020-agentic-coding-studio/comp4020-crit2-Astra-Erevos)
-(`00332bd`), an unsolicited redesign of Kmart Australia's clearance pages and
-one of this week's hall-of-fame picks. It is here because it is good. Whatever
-the lecture does to it is a demonstration of the loop and says nothing about the
-work.
+There is no artefact in the tree right now: it sits at the course's static
+prototype starter, refreshed from
+[template-static](https://github.com/comp4020-agentic-coding-studio/template-static)
+(`b43d91c`), which is what a student sees on the first `pnpm dev` of a new
+prototype repo. Week 3's vendored artefact went out with the week it was
+borrowed for.
 
 ## Follow along
 
@@ -55,6 +55,6 @@ Keep anything you want to retain on your own branch or worktree before the next
 lecture's reset.
 
 The demo runs the same checks as the student starter: `pnpm check` covers the
-typecheck, the build, the linters and the tests. The stack underneath is
-whatever the current artefact brought with it — Astro, at the moment, on the
-template's tooling.
+typecheck, the build and the tests. The stack underneath is whatever the current
+artefact brought with it — at the baseline, that is the starter's own: Vite over
+hand-written HTML, CSS and TypeScript.
