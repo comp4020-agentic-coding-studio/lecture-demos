@@ -20,14 +20,34 @@ export const MIDDLE_GREY = 0.18;
 
 /**
  * Photons counted by one sensor cell, per unit of scene radiance, at the
- * reference aperture and shutter. Sets the whole simulation's photon budget:
- * a mid grey lands on 0.18 x 700 = 126 photons when correctly exposed, which
- * is grainy enough to see and clean enough to read as a photograph.
+ * reference aperture and shutter. Sets the whole simulation's photon budget.
+ * With the colour filters on, a correctly exposed mid grey lands about
+ * 0.18 x 1600 / 3 = 96 photons in the one band its cell can see --- grainy
+ * enough to be worth looking at, clean enough to read as a photograph.
  */
-export const PHOTONS_PER_UNIT_RADIANCE = 700;
+export const PHOTONS_PER_UNIT_RADIANCE = 1600;
 
 /** Tunes how fast defocus grows. Chosen so f/16 is sharp and f/1.4 is not. */
 export const DEFOCUS_SCALE = 13;
+
+/**
+ * What the display has to put back to undo the colour filter array. A filtered
+ * cell sees one band of three, so its count is a third of what an unfiltered
+ * cell would have recorded, and the render multiplies by three to compensate.
+ * Gain, not light: see `cfaGrainPenalty` for what it costs.
+ */
+export const CFA_GAIN = 3;
+
+/**
+ * How much worse the grain is with the filters on. A third of the photons means
+ * a third of the count, and grain goes as one over the root of the count ---
+ * so root three, or a little over three quarters of a stop. Kept out of
+ * `relativeGrain` deliberately: that function describes the sensor's counting,
+ * and this describes what is stuck in front of it.
+ */
+export function cfaGrainPenalty(colour: boolean): number {
+  return colour ? Math.sqrt(CFA_GAIN) : 1;
+}
 
 /** Widest and narrowest stops offered, in the order the slider steps through. */
 export const F_NUMBERS = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16] as const;

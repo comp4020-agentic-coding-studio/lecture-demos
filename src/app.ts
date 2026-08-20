@@ -2,7 +2,9 @@
 // lives in optics.ts, scene.ts and sensor.ts; nothing here decides what a
 // photograph should look like.
 import { createAliasTable, fillAlias } from "./alias.ts";
+import { blackbodyRgb, CHANNELS, whiteBalanceGains, type Rgb } from "./colour.ts";
 import {
+  cfaGrainPenalty,
   exposureStops,
   exposureVerdict,
   formatAperture,
@@ -23,11 +25,13 @@ import {
 import { mulberry32 } from "./rng.ts";
 import {
   bulbCentre,
+  BULB_KELVIN,
   CELLS,
   combineRadiance,
   createScene,
   HEIGHT,
   PRESETS,
+  SKY_KELVIN,
   subjectWeights,
   WIDTH,
   type Preset,
@@ -37,8 +41,10 @@ import {
   buildToneLut,
   FULL_WELL,
   photonsForExposure,
-  renderCounts,
+  renderColour,
   renderIdeal,
+  renderMono,
+  type SensorMode,
 } from "./sensor.ts";
 
 function el<T extends HTMLElement>(id: string): T {
@@ -59,14 +65,17 @@ const FASTEST = 40_000_000;
 /** Never spend more than this in one animation frame, whatever the slider says. */
 const PER_FRAME_CEILING = 400_000;
 /** Once this little of the scene can still record anything, the frame is done. */
-const SATURATION_FLOOR = 0.005;
+const SATURATION_FLOOR = 0.02;
 /** How long a finished frame is held on screen before the next exposure. */
 const READOUT_SECONDS = 0.75;
 /** How far from the focal plane the window sits, for the trade-off readout. */
 const WINDOW_DEPTH = 1;
+/** Ends of the white-balance slider, in kelvin. */
+const COOLEST_WB = 2500;
+const WARMEST_WB = 12000;
 
 type Phase = "idle" | "exposing" | "readout";
-type Tool = "light" | "shade";
+type Tool = "light" | "shade" | "warm" | "cool";
 
 export function start(): void {
   const scene = createScene();
@@ -74,11 +83,12 @@ export function start(): void {
   const rng = mulberry32(0x5eed);
 
   // --- buffers -------------------------------------------------------------
-  const paint = new Float32Array(CELLS).fill(1);
-  const radiance = new Float64Array(CELLS);
-  const emissionWeights = new Float64Array(CELLS);
+  const paint = new Float32Array(CELLS * CHANNELS).fill(1);
+  const radiance = new Float64Array(CELLS * CHANNELS);
+  const emissionWeights = new Float64Array(CELLS * CHANNELS);
+  const planes = new Float32Array(CELLS * CHANNELS);
   const counts = new Uint32Array(CELLS);
-  const table = createAliasTable(CELLS);
+  const table = createAliasTable(CELLS * CHANNELS);
 
   const sensorCanvas = el<HTMLCanvasElement>("sensor");
   const referenceCanvas = el<HTMLCanvasElement>("reference");
@@ -90,9 +100,12 @@ export function start(): void {
   // --- state ---------------------------------------------------------------
   let preset: Preset = PRESETS[1];
   const settings: Settings = { iso: 100, fNumber: 4, shutterSeconds: 1 / 60 };
-  let speed = 6_000_000;
+  let speed = 10_000_000;
   let tool: Tool = "shade";
   let strokes = 0;
+  let mode: SensorMode = "colour";
+  let whiteBalanceKelvin = BULB_KELVIN;
+  let whiteBalance: Rgb = whiteBalanceGains(whiteBalanceKelvin);
 
   let phase: Phase = "idle";
   let running = false;
@@ -122,7 +135,11 @@ export function start(): void {
       fillAlias(table, radiance);
     } else {
       for (let i = 0; i < CELLS; i++) {
-        emissionWeights[i] = counts[i] < FULL_WELL ? radiance[i] : 0;
+        const live = counts[i] < FULL_WELL;
+        const s = i * CHANNELS;
+        emissionWeights[s] = live ? radiance[s] : 0;
+        emissionWeights[s + 1] = live ? radiance[s + 1] : 0;
+        emissionWeights[s + 2] = live ? radiance[s + 2] : 0;
       }
       fillAlias(table, emissionWeights);
     }
@@ -178,6 +195,7 @@ export function start(): void {
         staticWeight: table.total,
         lightLevel: preset.lightLevel,
         settings,
+        mode,
         timeFrom: from,
         timeSpan: span,
         budget,
@@ -207,6 +225,7 @@ export function start(): void {
   const costIso = el("cost-iso");
   const costAperture = el("cost-aperture");
   const costShutter = el("cost-shutter");
+  const costFilters = el("cost-filters");
   const prompt = el("prompt");
   const strokesOut = el("strokes");
 
@@ -228,7 +247,9 @@ export function start(): void {
   function updateReadouts(): void {
     const stops = exposureStops(meanRadiance, settings);
     const verdict = exposureVerdict(stops);
-    const grain = relativeGrain(meanRadiance, settings.fNumber, settings.shutterSeconds);
+    const grain =
+      relativeGrain(meanRadiance, settings.fNumber, settings.shutterSeconds) *
+      cfaGrainPenalty(mode === "colour");
 
     verdictOut.textContent =
       verdict === "balanced" ? "balanced" : `${formatStops(stops)} — ${verdict}`;
@@ -257,23 +278,41 @@ export function start(): void {
     const dof = circleOfConfusionRadius(settings.fNumber, WINDOW_DEPTH, 0);
     costAperture.textContent = `${formatStops(Math.log2(apertureFactor(settings.fNumber)))} of light. The window spreads over ${dof.toFixed(1)} cells.`;
     costShutter.textContent = `${formatStops(Math.log2(shutterFactor(settings.shutterSeconds)))} of light. The bulb travels ${bulbTravel().toFixed(1)} cells while it is open.`;
+    costFilters.textContent =
+      mode === "colour"
+        ? `Two photons in three absorbed — ${cfaGrainPenalty(true).toFixed(2)}× the grain of the same sensor without them. White balance is holding blue at ×${whiteBalance[2].toFixed(2)}.`
+        : "Lifted off. Every photon counts, and there is no colour to be had.";
 
     if (verdict !== lastVerdict) {
       lastVerdict = verdict;
       sensorCanvas.setAttribute(
         "aria-label",
-        `A simulated sensor, ${formatStops(stops)} from a mid-grey rendering: ${verdict}. Grain at the metered tone, ${(grain * 100).toFixed(0)} per cent.`,
+        `A simulated ${mode} sensor, ${formatStops(stops)} from a mid-grey rendering: ${verdict}. Grain at the metered tone, ${(grain * 100).toFixed(0)} per cent.`,
       );
     }
   }
 
   // --- drawing -------------------------------------------------------------
   function draw(): void {
-    renderCounts(counts, settings.iso, lut, sensorImage);
+    if (mode === "colour") {
+      renderColour(counts, planes, settings.iso, whiteBalance, lut, sensorImage);
+    } else {
+      renderMono(counts, settings.iso, lut, sensorImage);
+    }
     sensorCtx.putImageData(sensorImage, 0, 0);
 
     const exposureFactor = meanRadiance > 0 ? MIDDLE_GREY / meanRadiance : 0;
-    renderIdeal(radiance, scene, preset.lightLevel, sceneClock, exposureFactor, lut, referenceImage);
+    renderIdeal(
+      radiance,
+      scene,
+      preset.lightLevel,
+      sceneClock,
+      exposureFactor,
+      mode,
+      whiteBalance,
+      lut,
+      referenceImage,
+    );
     referenceCtx.putImageData(referenceImage, 0, 0);
   }
 
@@ -335,7 +374,26 @@ export function start(): void {
     presetsHost.append(button);
   }
 
-  const toolButtons = [el<HTMLButtonElement>("tool-light"), el<HTMLButtonElement>("tool-shade")];
+  const modeButtons = [el<HTMLButtonElement>("mode-colour"), el<HTMLButtonElement>("mode-mono")];
+  for (const button of modeButtons) {
+    button.setAttribute("aria-pressed", String(button.dataset.mode === mode));
+    button.addEventListener("click", () => {
+      mode = button.dataset.mode as SensorMode;
+      for (const sibling of modeButtons) {
+        sibling.setAttribute("aria-pressed", String(sibling === button));
+      }
+      // The filters change what gets recorded, not what arrives, so the frame
+      // in progress is no longer one thing or the other. Start a clean one.
+      if (phase === "exposing") openShutter();
+    });
+  }
+
+  const toolButtons = [
+    el<HTMLButtonElement>("tool-light"),
+    el<HTMLButtonElement>("tool-shade"),
+    el<HTMLButtonElement>("tool-warm"),
+    el<HTMLButtonElement>("tool-cool"),
+  ];
   for (const button of toolButtons) {
     button.setAttribute("aria-pressed", String(button.dataset.tool === tool));
     button.addEventListener("click", () => {
@@ -377,6 +435,28 @@ export function start(): void {
     if (phase === "exposing") openShutter();
   });
 
+  const wbInput = el<HTMLInputElement>("white-balance");
+  const wbOut = el("white-balance-value");
+  const wbNote = el("white-balance-note");
+  wbInput.min = String(COOLEST_WB);
+  wbInput.max = String(WARMEST_WB);
+  const updateWhiteBalance = (): void => {
+    whiteBalanceKelvin = Number(wbInput.value);
+    whiteBalance = whiteBalanceGains(whiteBalanceKelvin);
+    wbOut.textContent = `${whiteBalanceKelvin} K`;
+    // Name the two settings that matter, so the slider reads as a decision
+    // about which light source to believe rather than a colour tint.
+    const nearBulb = Math.abs(whiteBalanceKelvin - BULB_KELVIN) < 250;
+    const nearSky = Math.abs(whiteBalanceKelvin - SKY_KELVIN) < 2500;
+    wbNote.textContent = nearBulb
+      ? "believing the bulb — the window goes blue"
+      : nearSky
+        ? "believing the sky — the room goes orange"
+        : "somewhere between the two lights";
+  };
+  wbInput.addEventListener("input", updateWhiteBalance);
+  updateWhiteBalance();
+
   const speedInput = el<HTMLInputElement>("speed");
   const speedOut = el("speed-value");
   const updateSpeed = (): void => {
@@ -400,9 +480,26 @@ export function start(): void {
         const d = Math.hypot(x - cx, y - cy) / BRUSH_RADIUS;
         if (d >= 1) continue;
         const falloff = (1 - d) ** 2;
-        const i = y * WIDTH + x;
-        const factor = tool === "light" ? 1 + 0.4 * falloff : 1 / (1 + 0.5 * falloff);
-        paint[i] = Math.max(0.02, Math.min(30, paint[i] * factor));
+        const s = (y * WIDTH + x) * CHANNELS;
+        // Light and shade are a dimmer; warm and cool are a gel, pushing red
+        // against blue and leaving the total roughly where it was.
+        let fr: number;
+        let fg: number;
+        let fb: number;
+        if (tool === "light") {
+          fr = fg = fb = 1 + 0.4 * falloff;
+        } else if (tool === "shade") {
+          fr = fg = fb = 1 / (1 + 0.5 * falloff);
+        } else {
+          const push = 1 + 0.45 * falloff;
+          const warm = tool === "warm";
+          fr = warm ? push : 1 / push;
+          fg = 1;
+          fb = warm ? 1 / push : push;
+        }
+        paint[s] = Math.max(0.02, Math.min(30, paint[s] * fr));
+        paint[s + 1] = Math.max(0.02, Math.min(30, paint[s + 1] * fg));
+        paint[s + 2] = Math.max(0.02, Math.min(30, paint[s + 2] * fb));
       }
     }
   }
@@ -494,15 +591,17 @@ export function start(): void {
 export function renderStrip(budgets: readonly number[]): void {
   const scene = createScene();
   const lut = buildToneLut();
-  const paint = new Float32Array(CELLS).fill(1);
-  const radiance = new Float64Array(CELLS);
+  const paint = new Float32Array(CELLS * CHANNELS).fill(1);
+  const radiance = new Float64Array(CELLS * CHANNELS);
+  const planes = new Float32Array(CELLS * CHANNELS);
   const counts = new Uint32Array(CELLS);
   const settings: Settings = { iso: 100, fNumber: 4, shutterSeconds: 1 / 60 };
   const preset = PRESETS[1];
+  const whiteBalance = whiteBalanceGains(BULB_KELVIN);
 
   const staticWeight = combineRadiance(scene, preset.lightLevel, paint, radiance);
   const sceneWeight = staticWeight + subjectWeights(scene.subject, preset.lightLevel).total;
-  const table = fillAlias(createAliasTable(CELLS), radiance);
+  const table = fillAlias(createAliasTable(CELLS * CHANNELS), radiance);
   const full = photonsForExposure(sceneWeight, settings);
 
   budgets.forEach((budget, index) => {
@@ -518,13 +617,14 @@ export function renderStrip(budgets: readonly number[]): void {
       staticWeight,
       lightLevel: preset.lightLevel,
       settings,
+      mode: "colour",
       timeFrom: 0.6,
       timeSpan: settings.shutterSeconds,
       budget,
       rng: mulberry32(0x1000 + index),
     });
     // Push the ISO by exactly the shortfall, so all four match in brightness.
-    renderCounts(counts, (settings.iso * full) / budget, lut, image);
+    renderColour(counts, planes, (settings.iso * full) / budget, whiteBalance, lut, image);
     ctx.putImageData(image, 0, 0);
   });
 }

@@ -39,6 +39,14 @@ itself an emergent thing: no photon knows the picture, and the picture arrives
 anyway — so the second prototype's mechanic turns out to be the honest way to
 explain the first one's subject.
 
+The sensor models a colour filter array, because that is the honest way to add
+colour and because it earns its keep twice: it shows that colour costs about
+three quarters of a stop (each cell counts one band in three, and the
+filters-off toggle makes the difference visible rather than asserted), and it
+turns shot noise into the blotchy chroma speckle that Exposure Lab claims and
+cannot demonstrate. White balance comes with it, and behaves like ISO — gain at
+readout, amplifying the noise along with the signal.
+
 Underneath it, the repo still sits on the course's static prototype starter,
 refreshed from
 [template-static](https://github.com/comp4020-agentic-coding-studio/template-static)
@@ -78,7 +86,8 @@ artefact brought with it — at the baseline, that is the starter's own: Vite ov
 hand-written HTML, CSS and TypeScript.
 
 `spec/exposure.test.ts` holds this week's spec tests. They check the claims the
-page makes out loud: that ISO is applied at readout and appears nowhere in the
+page makes out loud: that neither ISO nor white balance appears anywhere in the
 emission loop, that grain goes as one over the square root of the photon count,
-that each dial buys light at its own price, and that the page ships the dials,
-the method and the limits it says it does.
+that each dial buys light at its own price, that the colour filters throw away
+two photons in three and charge root three in grain for it, and that the page
+ships the dials, the method and the limits it says it does.
