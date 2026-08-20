@@ -34,7 +34,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Build, lint, and run the spec
+      - name: Build and run the spec
         run: pnpm check
       - name: Check internal links
         # Internal links only, matching the template this repo starts from.

@@ -21,14 +21,21 @@ one top-level heading, a document language, a real title, a mobile viewport, and
 alt text on images. They run against the **built** site (`dist/`), so they check
 what actually ships. Keep them green; don't delete them.
 
+## The starter's worked example
+
+`starter.test.ts` shows the shape of a spec test: it checks the starter page's
+intro hook. It is an example to replace, not part of the always-on contract —
+it goes when the starter page does, and its failure message says so.
+
 ## Tests the artefact brought with it
 
 When a week starts from a vendored prototype (see `README.md`), that repo's own
-spec tests come in with it — `crit-2.test.ts` here, written against the C2 spec
-by whoever built the prototype. They stay: they are free sensors, they cover
-contracts this site still has to honour, and one of them going red under a
-lecture's changes is exactly the sort of thing the class should watch happen.
-They go out with the artefact they came with, not before.
+spec tests come in with it, written against that deliverable's spec by whoever
+built the prototype. They stay: they are free sensors, they cover contracts this
+site still has to honour, and one of them going red under a lecture's changes is
+exactly the sort of thing the class should watch happen. They go out with the
+artefact they came with, not before. Nothing is vendored in the tree right now,
+so there are none here.
 
 ## The week's spec tests (written live)
 
