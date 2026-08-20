@@ -39,11 +39,11 @@ pnpm dev
 
 ## Check-ins
 
-Three times a lecture the slides stop and you take the demo over: what the
-agent has done gets revealed on the projector, and one "yes, and" from you
-— the premise set at the launch, pushed further — is typed in and run.
-There is nothing to prepare and no blank to fill in — half a minute with the
-person next to you, then call it out.
+Three times a lecture the slides stop and you take the demo over: what the agent
+has done gets revealed on the projector, and one "yes, and" from you — the
+premise set at the launch, pushed further — is typed in and run. There is
+nothing to prepare and no blank to fill in — half a minute with the person next
+to you, then call it out.
 
 The run is pushed after the lecture rather than during it, so pulling
 mid-session won't track the projector — watch the screen instead. Afterwards, a
