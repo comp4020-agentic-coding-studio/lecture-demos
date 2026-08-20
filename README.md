@@ -19,12 +19,30 @@ from its public repo, so a lecture starts from something that already works
 instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
 `spec/`, the CI workflow and the build tooling — accumulates all semester.
 
-There is no artefact in the tree right now: it sits at the course's static
-prototype starter, refreshed from
+This week's artefact is **Photon Count**, an interactive explainer about how a
+camera turns light into a photograph. It was not vendored: it was built here,
+live, as a mash-up of two hall-of-fame picks from the Assignment 1 crit, on the
+class's call.
+
+- the **subject** — explaining camera exposure, and the trade-off framing of the
+  exposure triangle — comes from
+  [Exposure Lab](https://comp4020-agentic-coding-studio.github.io/comp4020-ass1-zdy-forever/)
+- the **mechanic** — a real-time simulation of many independent agents, with
+  live readouts, scene presets, direct painting on the canvas, staged
+  experiments, a disclosed method and an honest list of what the model leaves
+  out — comes from the ant-colony explainer at
+  [comp4020-ass1-1181278174](https://comp4020-agentic-coding-studio.github.io/comp4020-ass1-1181278174/)
+
+No code was copied from either. Both were read as visitors read them, and what
+was borrowed was an idea in each case. The joining move is that a photograph is
+itself an emergent thing: no photon knows the picture, and the picture arrives
+anyway — so the second prototype's mechanic turns out to be the honest way to
+explain the first one's subject.
+
+Underneath it, the repo still sits on the course's static prototype starter,
+refreshed from
 [template-static](https://github.com/comp4020-agentic-coding-studio/template-static)
-(`b43d91c`), which is what a student sees on the first `pnpm dev` of a new
-prototype repo. Week 3's vendored artefact went out with the week it was
-borrowed for.
+(`b43d91c`): Vite over hand-written HTML, CSS and TypeScript.
 
 ## Follow along
 
@@ -58,3 +76,9 @@ The demo runs the same checks as the student starter: `pnpm check` covers the
 typecheck, the build and the tests. The stack underneath is whatever the current
 artefact brought with it — at the baseline, that is the starter's own: Vite over
 hand-written HTML, CSS and TypeScript.
+
+`spec/exposure.test.ts` holds this week's spec tests. They check the claims the
+page makes out loud: that ISO is applied at readout and appears nowhere in the
+emission loop, that grain goes as one over the square root of the photon count,
+that each dial buys light at its own price, and that the page ships the dials,
+the method and the limits it says it does.

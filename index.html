@@ -3,17 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COMP4020 prototype</title>
+    <title>Photon Count — how a camera turns light into a photograph</title>
     <meta
       name="description"
-      content="Replace this with one sentence saying what this page is. A search result and a link preview both show it."
+      content="An interactive explainer: a simulated sensor counts photons one at a time, so exposure, grain, depth of field and motion blur emerge from the counting instead of being asserted."
     />
 
-    <!--
-      The link-preview card: public/card.png, 1200x630 --- replace it. The URL
-      resolves against this page, like any link. No og:title/og:description:
-      scrapers fall back to the <title> and description above.
-    -->
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./card.png" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -21,18 +16,321 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header>
+    <a class="skip" href="#try-it">Skip to the simulation</a>
+
+    <header class="page-head">
       <nav aria-label="Primary">
-        <a href="./">Home</a>
+        <a href="#intro">Intro</a>
+        <a href="#try-it">Try it</a>
+        <a href="#experiments">Experiments</a>
+        <a href="#under-the-hood">Under the hood</a>
+        <a href="#limits">What it leaves out</a>
+        <a href="#sources">Sources</a>
       </nav>
     </header>
+
     <main>
-      <h1>COMP4020 prototype</h1>
-      <p data-testid="intro">
-        Replace this with your prototype. This week's brief is on the course website;
-        <code>spec/README.md</code> explains how the checks in this repo relate to it.
-      </p>
+      <section id="intro" class="intro">
+        <p class="kicker">An interactive explainer</p>
+        <h1>No photon knows the picture. Count enough of them and the photograph is just there.</h1>
+
+        <div class="intro-body">
+          <p class="lede">
+            A camera has no idea what it is looking at. Light arrives at the sensor as separate
+            photons; each one lands in one cell; the cell adds one to a tally. That is the whole of
+            it. A photograph is what a few million tallies look like from far enough away.
+          </p>
+          <p>
+            Every argument a photographer has ever had follows from that one fact.
+            <strong>Aperture</strong> is how wide the hole is, so it sets how many photons get
+            through each second. <strong>Shutter speed</strong> is how long the counting runs.
+            <strong>ISO</strong> multiplies the tally after the counting has stopped — which is
+            exactly why it can brighten a photograph and can never improve one.
+          </p>
+          <p>
+            Below is a sensor of 220 × 140 cells with every photon simulated separately. Nothing in
+            it draws a picture, applies a blur, or adds grain. Press the shutter and watch those
+            things happen anyway.
+          </p>
+          <p class="cta"><a class="button-link" href="#try-it">See it expose ↓</a></p>
+        </div>
+
+        <figure class="strip">
+          <div class="strip-frames">
+            <div class="strip-frame">
+              <canvas id="strip-0" width="220" height="140"></canvas>
+              <figcaption>250 photons</figcaption>
+            </div>
+            <div class="strip-frame">
+              <canvas id="strip-1" width="220" height="140"></canvas>
+              <figcaption>4 thousand</figcaption>
+            </div>
+            <div class="strip-frame">
+              <canvas id="strip-2" width="220" height="140"></canvas>
+              <figcaption>60 thousand</figcaption>
+            </div>
+            <div class="strip-frame">
+              <canvas id="strip-3" width="220" height="140"></canvas>
+              <figcaption>1 million</figcaption>
+            </div>
+          </div>
+          <figcaption class="strip-caption">
+            One scene, one sensor, four exposures — each amplified to the same average brightness,
+            the way you would push the ISO to rescue a dark frame. The only thing that differs
+            along the row is how many photons were counted before the shutter closed.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section id="try-it" class="sim" aria-labelledby="sim-heading">
+        <h2 id="sim-heading" class="visually-hidden">The simulation</h2>
+
+        <div class="sim-stage">
+          <div class="frame">
+            <canvas
+              id="sensor"
+              width="220"
+              height="140"
+              role="img"
+              aria-label="A simulated sensor. Press Run to start counting photons."
+            ></canvas>
+            <p id="prompt" class="prompt">Press <strong>Run</strong></p>
+          </div>
+
+          <ul class="legend">
+            <li><span class="swatch swatch-scene"></span>a windowsill at dusk</li>
+            <li><span class="swatch swatch-bulb"></span>a bulb, swinging, on the focal plane</li>
+            <li><span class="swatch swatch-far"></span>the window, one unit behind it</li>
+            <li><span class="swatch swatch-near"></span>a sprig, in front of it</li>
+          </ul>
+
+          <figure class="reference">
+            <canvas id="reference" width="220" height="140" role="img" aria-label="The scene rendered without noise, defocus or motion blur."></canvas>
+            <figcaption>The scene itself — no counting, no lens, no time.</figcaption>
+          </figure>
+        </div>
+
+        <div class="sim-panel">
+          <p class="readout-big"><span id="verdict">not exposing yet</span></p>
+          <p class="readout-line" id="status" aria-live="polite">press Run to open the shutter</p>
+          <p class="readout-line" id="tally">photons: 0</p>
+
+          <div class="meter" aria-hidden="true">
+            <div class="meter-scale">
+              <div class="meter-fill" id="meter-fill"></div>
+              <div class="meter-zero"></div>
+            </div>
+            <p class="meter-caption"><span id="meter-label">−6 stops … +6 stops</span></p>
+          </div>
+
+          <div class="control">
+            <span class="control-label" id="light-label">Light</span>
+            <div class="segmented" role="group" aria-labelledby="light-label" id="presets"></div>
+          </div>
+
+          <div class="control">
+            <span class="control-label" id="brush-label">Brush the scene</span>
+            <div class="segmented" role="group" aria-labelledby="brush-label">
+              <button type="button" id="tool-light" data-tool="light">Light</button>
+              <button type="button" id="tool-shade" data-tool="shade">Shade</button>
+            </div>
+            <p class="hint">Drag on the sensor to relight part of the set. <span id="strokes">nothing painted</span></p>
+          </div>
+
+          <div class="control">
+            <label class="control-label" for="iso">ISO — <b id="iso-value">100</b></label>
+            <input type="range" id="iso" min="0" max="7" step="1" value="0" />
+            <p class="ends"><span>clean</span><span>grainy</span></p>
+          </div>
+
+          <div class="control">
+            <label class="control-label" for="aperture">Aperture — <b id="aperture-value">f/4</b></label>
+            <input type="range" id="aperture" min="0" max="7" step="1" value="3" />
+            <p class="ends"><span>wide open</span><span>stopped down</span></p>
+          </div>
+
+          <div class="control">
+            <label class="control-label" for="shutter">Shutter — <b id="shutter-value">1/60 s</b></label>
+            <input type="range" id="shutter" min="0" max="10" step="1" value="4" />
+            <p class="ends"><span>brief</span><span>long</span></p>
+          </div>
+
+          <div class="control">
+            <label class="control-label" for="speed">Speed — <b id="speed-value">6.0M</b> photons per second</label>
+            <input type="range" id="speed" min="0" max="100" step="1" value="83" />
+            <p class="ends"><span>watch them land</span><span>real time</span></p>
+          </div>
+
+          <div class="buttons">
+            <button type="button" id="run" class="primary">Run</button>
+            <button type="button" id="reset">Reset</button>
+            <button type="button" id="clear-light">Clear brush</button>
+          </div>
+
+          <div class="tradeoff">
+            <h3>What each dial is costing you</h3>
+            <dl>
+              <div><dt>ISO</dt><dd id="cost-iso"></dd></div>
+              <div><dt>Aperture</dt><dd id="cost-aperture"></dd></div>
+              <div><dt>Shutter</dt><dd id="cost-shutter"></dd></div>
+            </dl>
+            <p class="tradeoff-foot">
+              Three ways to double the light. None of them is free, and the sim charges you for each
+              one in a different currency.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="experiments" class="prose">
+        <h2>Three things to try</h2>
+
+        <article>
+          <h3>1. Just run it</h3>
+          <p>
+            Turn the speed down and watch the first few hundred photons arrive. There is no picture
+            yet — there is a scatter of lit cells, and it is the brightest parts of the scene that
+            get lit first, because that is where photons are most likely to come from. Keep
+            watching. Nothing sharpens, nothing resolves, nothing is applied: the tallies just get
+            bigger, and somewhere around a hundred thousand arrivals the scatter stops looking like
+            a scatter.
+          </p>
+        </article>
+
+        <article>
+          <h3>2. Take the light away, then buy it back three ways</h3>
+          <p>
+            Switch to <b>Candlelit</b>. Everything in the room loses three stops — everything
+            except the bulb, which is a lamp and keeps its own light, so the meter reads a little
+            better than three stops down. The frame collapses into speckle. Now buy those three
+            stops back: first with ISO alone, then reset and use the aperture, then reset and use
+            the shutter.
+          </p>
+          <p>
+            ISO gets the brightness back and not one bit of the quality: the grain readout does not
+            move, because the sensor counted exactly as few photons as before and ISO only
+            multiplied them. The aperture gets the brightness back <em>and</em> cleans the frame up
+            — eight times the photons, a third of the grain — and softens the window behind the
+            bulb, because a wider hole gathers each point over a wider disc. The shutter gets the
+            brightness back and the same clean-up, and smears the bulb into a stripe, because the
+            bulb kept moving while the counting ran.
+          </p>
+          <p>
+            This is the exposure triangle, and it is not a rule of thumb. It is three different
+            physical quantities that happen to have the same effect on one number.
+          </p>
+        </article>
+
+        <article>
+          <h3>3. Relight the set while it runs</h3>
+          <p>
+            Pick the <b>Shade</b> brush and drag it across the sill, leaving the window alone. Watch
+            what happens to the two halves of the frame. The window stays clean; the sill dissolves
+            into noise — in the same photograph, at the same ISO, with the same sensor. Grain is not
+            a property of the camera. It is a property of how much light a particular part of the
+            scene sent you.
+          </p>
+          <p>
+            Then take the <b>Light</b> brush to the shadows. They come back, and they come back
+            clean. This is why photographers move lamps around instead of turning ISO up.
+          </p>
+        </article>
+      </section>
+
+      <section id="under-the-hood" class="prose">
+        <h2>Under the hood</h2>
+        <p>What the simulation actually does, so you can check the claims above against it.</p>
+        <ul class="methods">
+          <li>
+            <b>Scene.</b> Radiance is authored, not rendered: each of the 30,800 cells carries a
+            brightness and a distance from the focal plane. The light brush multiplies a region's
+            brightness; the presets multiply the whole set.
+          </li>
+          <li>
+            <b>Emission.</b> Photons are drawn independently, each one landing on a cell with
+            probability proportional to that cell's radiance. Counts per cell are therefore Poisson,
+            which is what real photon arrivals are. Nothing anywhere adds a noise term.
+          </li>
+          <li>
+            <b>Aperture.</b> The photon budget scales as
+            <span class="mono">(4/N)²</span> — the area of the hole. Defocus is geometric: a point
+            at distance <span class="mono">d</span> from the focal plane spreads over a disc of
+            radius <span class="mono">13·d/N</span> cells, sampled uniformly. The bulb sits on the
+            focal plane and so is never defocused.
+          </li>
+          <li>
+            <b>Shutter.</b> The budget scales linearly with the open time. Each photon picks its own
+            arrival instant inside that window, and the bulb is wherever the pendulum puts it at
+            that instant. Motion blur is not drawn; it is the spread of those instants.
+          </li>
+          <li>
+            <b>ISO.</b> Applied once, at readout, as a multiplier on the finished tally. It is a
+            parameter of the display function and appears nowhere in the emission or the noise —
+            <span class="mono">spec/exposure.test.ts</span> fails if it ever does.
+          </li>
+          <li>
+            <b>Metering.</b> "Balanced" means the scene's mean radiance renders at 18% grey. Grain is
+            reported as <span class="mono">1/√N</span> at that metered tone.
+          </li>
+        </ul>
+      </section>
+
+      <section id="limits" class="prose">
+        <h2>What it leaves out</h2>
+        <p>
+          This sensor is an ideal photon counter, and a real one is not. The gap matters most for
+          the cleanest claim on this page.
+        </p>
+        <p>
+          <b>ISO is not quite as innocent as the sim makes it look.</b> Shot noise is the only noise
+          modelled here, and ISO genuinely cannot touch it. Real sensors also have read noise, added
+          after the analogue gain on many designs — so on those cameras raising ISO really does buy
+          a slightly cleaner shadow, which is why photographers argue about whether a given body is
+          "ISO-invariant". The claim that survives is the one the sim demonstrates: ISO never
+          recovers a photon you did not collect.
+        </p>
+        <p>
+          Also absent: dark current, fixed-pattern non-uniformity, quantisation, colour of any kind
+          (there is no colour filter array here, so no colour noise and no demosaic), lens
+          aberrations, and diffraction. That last one is why the sim rewards opening the aperture all
+          the way and a real lens does not.
+        </p>
+      </section>
+
+      <section id="sources" class="prose">
+        <h2>Sources</h2>
+        <ul class="sources">
+          <li>
+            Hasinoff, S. W. (2014). Photon, Poisson noise. In <cite>Computer Vision: A Reference
+            Guide</cite> (pp. 608–610). Springer.
+            <a href="https://doi.org/10.1007/978-0-387-31439-6_482">doi:10.1007/978-0-387-31439-6_482</a>
+          </li>
+          <li>
+            Healey, G. E., &amp; Kondepudy, R. (1994). Radiometric CCD camera calibration and noise
+            estimation. <cite>IEEE Transactions on Pattern Analysis and Machine Intelligence</cite>,
+            16(3), 267–276.
+            <a href="https://doi.org/10.1109/34.276126">doi:10.1109/34.276126</a>
+          </li>
+          <li>
+            Hasinoff, S. W., Durand, F., &amp; Freeman, W. T. (2010). Noise-optimal capture for high
+            dynamic range photography. <cite>CVPR 2010</cite>, 553–560.
+            <a href="https://people.csail.mit.edu/billf/publications/Noise-Optimal_Capture.pdf">PDF</a>
+          </li>
+          <li>
+            Janesick, J. R. (2007). <cite>Photon Transfer: DN → λ</cite>. SPIE Press (PM170).
+            <a href="https://spie.org/publications/book/725073">SPIE catalogue</a>
+          </li>
+        </ul>
+      </section>
     </main>
+
+    <footer class="page-foot">
+      <p>
+        A COMP4020 lecture demo: the subject is borrowed from one hall-of-fame prototype and the
+        mechanic from another. See <span class="mono">README.md</span> for the attribution.
+      </p>
+    </footer>
+
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

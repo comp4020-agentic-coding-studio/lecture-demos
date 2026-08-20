@@ -23,9 +23,9 @@ what actually ships. Keep them green; don't delete them.
 
 ## The starter's worked example
 
-`starter.test.ts` shows the shape of a spec test: it checks the starter page's
-intro hook. It is an example to replace, not part of the always-on contract —
-it goes when the starter page does, and its failure message says so.
+`starter.test.ts` shipped with the template as an example of the shape of a spec
+test, and, as its failure message promised, it went out with the starter page it
+described. `exposure.test.ts` took its place.
 
 ## Tests the artefact brought with it
 
@@ -40,11 +40,12 @@ so there are none here.
 ## The week's spec tests (written live)
 
 Turning the week's published spec into tests is your work, not the template's.
-Some spec lines are mechanically checkable — assert those here, in your own test
-file alongside the invariants (any `spec/*.test.ts` runs with `pnpm check`).
-Some lines only a person can judge; say those out loud instead. Write tests for
-the **contracts** — what the page must do, not how you built it — so the tests
-survive a change of approach, or of stack.
+`exposure.test.ts` is this week's set. Some spec lines are mechanically
+checkable — assert those here, in your own test file alongside the invariants
+(any `spec/*.test.ts` runs with `pnpm check`). Some lines only a person can
+judge; say those out loud instead. Write tests for the **contracts** — what the
+page must do, not how you built it — so the tests survive a change of approach,
+or of stack.
 
 A green suite here is backpressure, not a verdict. Nothing in this repo is
 marked; what it demonstrates is the loop, so a week's tests get deleted with
