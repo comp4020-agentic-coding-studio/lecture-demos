@@ -24,8 +24,9 @@ what actually ships. Keep them green; don't delete them.
 ## The starter's worked example
 
 `starter.test.ts` shipped with the template as an example of the shape of a spec
-test, and, as its failure message promised, it went out with the starter page it
-described. `exposure.test.ts` took its place.
+test, and went out in week 4 with the artefact that replaced the starter page,
+as its failure message promised it would. Nothing takes its place: a week's spec
+tests are written live.
 
 ## Tests the artefact brought with it
 
@@ -40,12 +41,11 @@ so there are none here.
 ## The week's spec tests (written live)
 
 Turning the week's published spec into tests is your work, not the template's.
-`exposure.test.ts` is this week's set. Some spec lines are mechanically
-checkable — assert those here, in your own test file alongside the invariants
-(any `spec/*.test.ts` runs with `pnpm check`). Some lines only a person can
-judge; say those out loud instead. Write tests for the **contracts** — what the
-page must do, not how you built it — so the tests survive a change of approach,
-or of stack.
+Some spec lines are mechanically checkable — assert those here, in your own test
+file alongside the invariants (any `spec/*.test.ts` runs with `pnpm check`).
+Some lines only a person can judge; say those out loud instead. Write tests for
+the **contracts** — what the page must do, not how you built it — so the tests
+survive a change of approach, or of stack.
 
 A green suite here is backpressure, not a verdict. Nothing in this repo is
 marked; what it demonstrates is the loop, so a week's tests get deleted with

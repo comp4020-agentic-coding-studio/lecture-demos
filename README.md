@@ -19,38 +19,12 @@ from its public repo, so a lecture starts from something that already works
 instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
 `spec/`, the CI workflow and the build tooling — accumulates all semester.
 
-This week's artefact is **Photon Count**, an interactive explainer about how a
-camera turns light into a photograph. It was not vendored: it was built here,
-live, as a mash-up of two hall-of-fame picks from the Assignment 1 crit, on the
-class's call.
-
-- the **subject** — explaining camera exposure, and the trade-off framing of the
-  exposure triangle — comes from
-  [Exposure Lab](https://comp4020-agentic-coding-studio.github.io/comp4020-ass1-zdy-forever/)
-- the **mechanic** — a real-time simulation of many independent agents, with
-  live readouts, scene presets, direct painting on the canvas, staged
-  experiments, a disclosed method and an honest list of what the model leaves
-  out — comes from the ant-colony explainer at
-  [comp4020-ass1-1181278174](https://comp4020-agentic-coding-studio.github.io/comp4020-ass1-1181278174/)
-
-No code was copied from either. Both were read as visitors read them, and what
-was borrowed was an idea in each case. The joining move is that a photograph is
-itself an emergent thing: no photon knows the picture, and the picture arrives
-anyway — so the second prototype's mechanic turns out to be the honest way to
-explain the first one's subject.
-
-The sensor models a colour filter array, because that is the honest way to add
-colour and because it earns its keep twice: it shows that colour costs about
-three quarters of a stop (each cell counts one band in three, and the
-filters-off toggle makes the difference visible rather than asserted), and it
-turns shot noise into the blotchy chroma speckle that Exposure Lab claims and
-cannot demonstrate. White balance comes with it, and behaves like ISO — gain at
-readout, amplifying the noise along with the signal.
-
-Underneath it, the repo still sits on the course's static prototype starter,
-refreshed from
+There is no artefact in the tree right now: it sits at the course's static
+prototype starter, refreshed from
 [template-static](https://github.com/comp4020-agentic-coding-studio/template-static)
-(`b43d91c`): Vite over hand-written HTML, CSS and TypeScript.
+(`b43d91c`), which is what a student sees on the first `pnpm dev` of a new
+prototype repo. Week 4's Photon Count was built here rather than vendored, and
+went out with the week it was built for.
 
 ## Follow along
 
@@ -84,10 +58,3 @@ The demo runs the same checks as the student starter: `pnpm check` covers the
 typecheck, the build and the tests. The stack underneath is whatever the current
 artefact brought with it — at the baseline, that is the starter's own: Vite over
 hand-written HTML, CSS and TypeScript.
-
-`spec/exposure.test.ts` holds this week's spec tests. They check the claims the
-page makes out loud: that neither ISO nor white balance appears anywhere in the
-emission loop, that grain goes as one over the square root of the photon count,
-that each dial buys light at its own price, that the colour filters throw away
-two photons in three and charge root three in grain for it, and that the page
-ships the dials, the method and the limits it says it does.
