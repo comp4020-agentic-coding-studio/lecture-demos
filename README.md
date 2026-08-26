@@ -20,10 +20,10 @@ instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
 `spec/`, the CI workflow and the build tooling — accumulates all semester.
 
 There is no artefact in the tree right now: it sits at the course's static
-prototype starter, refreshed from
+prototype starter, tracking
 [template-static](https://github.com/comp4020-agentic-coding-studio/template-static)
-(`b43d91c`), which is what a student sees on the first `pnpm dev` of a new
-prototype repo. Week 4's Photon Count was built here rather than vendored, and
+at `6f0a351` — the same starter a new prototype repo gets, plus this repo's own
+harness on top. Week 4's Photon Count was built here rather than vendored, and
 went out with the week it was built for.
 
 ## Follow along

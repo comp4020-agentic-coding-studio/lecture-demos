@@ -25,7 +25,8 @@ what actually ships. Keep them green; don't delete them.
 
 `starter.test.ts` shipped with the template as an example of the shape of a spec
 test, and went out in week 4 with the artefact that replaced the starter page,
-as its failure message promised it would. Nothing takes its place: a week's spec
+as its failure message promised it would. The template has since dropped it too,
+along with the page hook it asserted. Nothing takes its place: a week's spec
 tests are written live.
 
 ## Tests the artefact brought with it

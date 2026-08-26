@@ -68,7 +68,17 @@ jobs:
             --no-verification
 
   deploy:
-    needs: check
+    # Deliberately not `needs: check`. A blocked deploy does not take a site
+    # offline --- Pages keeps serving the last deployment --- so the site
+    # silently freezes at the last green commit while the repo moves on. In
+    # this repo that is the wrong failure: a red check is teaching material
+    # here, and a demo beat pushed red should still land on the deployed site
+    # rather than leave last week's build serving under this week's URL.
+    #
+    # The deploy runs its own `pnpm build`, which is the gate that matters
+    # here: a site that cannot build still cannot ship. The spec walks the
+    # built `dist/` for quality, not for deployability.
+    #
     # Pages can't serve a private repo on the free org anyway; the visibility
     # condition keeps a private-phase run from failing confusingly here.
     if: ${{ !github.event.repository.private && github.ref == 'refs/heads/main' }}
