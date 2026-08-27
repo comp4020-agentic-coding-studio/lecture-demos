@@ -146,10 +146,66 @@ function updateWind(speed: number, verticalFraction: number): void {
   windFilter.frequency.setTargetAtTime(targetFreq, now, 0.2);
 }
 
+// The underground theme's signature: a low note repeated in pairs, three
+// times, then a beat of quiet before the cycle turns over --- "duh-duh
+// duh-duh duh-duh". Built on the chimes' own lowest tone dropped an octave
+// rather than a transcription of Kondo's actual melody, so the cave hums in
+// the instrument's own tuning instead of quoting the theme note-for-note.
+const MOTIF_PATTERN = [1, 1, 1, 1, 1, 1, 0, 0];
+const MOTIF_TEMPO_BPM = 147;
+let motifTimer: ReturnType<typeof setTimeout> | null = null;
+let motifStep = 0;
+
+function playMotifNote(ctx: AudioContext, accent: boolean): void {
+  const now = ctx.currentTime;
+  const freq = NOTE_FREQS[0] / 2;
+
+  const osc = ctx.createOscillator();
+  osc.type = "square";
+  osc.frequency.value = freq;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 900;
+  filter.Q.value = 1.2;
+
+  // A muted "duh", not a ringing tone --- decayed almost fully before the
+  // next eighth note lands, with every first note of a pair sitting a touch
+  // louder and longer than the one right after it (the "duh-DUH" swing).
+  const env = ctx.createGain();
+  env.gain.setValueAtTime(0.0001, now);
+  env.gain.linearRampToValueAtTime(accent ? 0.22 : 0.15, now + 0.008);
+  env.gain.exponentialRampToValueAtTime(0.0005, now + (accent ? 0.16 : 0.11));
+
+  osc.connect(filter);
+  filter.connect(env);
+  env.connect(masterGain!);
+
+  osc.start(now);
+  osc.stop(now + 0.2);
+}
+
+function scheduleMotifStep(): void {
+  if (!underground || !audioCtx) return;
+  const step = motifStep % MOTIF_PATTERN.length;
+  if (MOTIF_PATTERN[step]) {
+    playMotifNote(audioCtx, step % 2 === 0);
+  }
+  motifStep++;
+  const eighthNoteMs = 60_000 / MOTIF_TEMPO_BPM / 2;
+  motifTimer = setTimeout(scheduleMotifStep, eighthNoteMs);
+}
+
+function stopMotif(): void {
+  if (motifTimer !== null) clearTimeout(motifTimer);
+  motifTimer = null;
+}
+
 // Ducks the pipe down into the cave below (or lifts it back out): mutes the
-// wind/water bed, muffles the whole mix, and leans the reverb wetter for a
-// cave's slap-back instead of the grove's open air. Called the instant a
-// down-press is recognised, so the audio and the visual crossfade together.
+// wind/water bed, muffles the whole mix, leans the reverb wetter for a
+// cave's slap-back instead of the grove's open air, and starts (or stops)
+// the underground motif. Called the instant a down-press is recognised, so
+// the audio and the visual crossfade together.
 function setUnderground(on: boolean): void {
   underground = on;
   if (!audioCtx || !muffleFilter || !waterGain || !wetGain) return;
@@ -157,6 +213,14 @@ function setUnderground(on: boolean): void {
   muffleFilter.frequency.setTargetAtTime(on ? 850 : 18000, now, 0.18);
   waterGain.gain.setTargetAtTime(on ? 0.015 : 0.05, now, 0.3);
   wetGain.gain.setTargetAtTime(on ? 0.65 : 0.4, now, 0.3);
+
+  if (on) {
+    motifStep = 0;
+    stopMotif();
+    scheduleMotifStep();
+  } else {
+    stopMotif();
+  }
 }
 
 // The pipe's own sound: a short pitch sweep standing in for the classic
