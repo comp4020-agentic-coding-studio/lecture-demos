@@ -5,6 +5,17 @@
   --seal: #a8341f;
   --sky-top: #bfe3ff;
   --sky-bottom: #eef8ff;
+  --brick-mortar: #1a0f2e;
+  --brick-face: #4a2a63;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 * {
@@ -38,6 +49,27 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+/* Down on a pipe swaps the overworld sky for a brick-and-mortar cave --- the
+   same two-gradient trick as the sky, just laid out as a grid instead of
+   drifting clouds. */
+body.underground {
+  color: var(--paper);
+  background:
+    repeating-linear-gradient(0deg, var(--brick-mortar) 0 4px, transparent 4px 46px),
+    repeating-linear-gradient(90deg, var(--brick-mortar) 0 4px, transparent 4px 92px),
+    var(--brick-face);
+  background-attachment: fixed;
+}
+
+body.underground .mario-hint,
+body.underground nav a {
+  color: #e8d9f2;
+}
+
+body.underground h1 {
+  color: #ffd23f;
 }
 
 header {
@@ -99,6 +131,7 @@ h1 {
   padding: 0 clamp(0.5rem, 4vw, 3rem) 1.5rem;
   touch-action: none;
   overflow: visible;
+  transition: filter 0.25s ease-out;
 }
 
 .ground {
@@ -110,6 +143,18 @@ h1 {
   background: linear-gradient(to bottom, #8bd450 0%, #8bd450 30%, #b97a3f 30%, #b97a3f 100%);
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4);
   z-index: 0;
+  transition: filter 0.25s ease-out;
+}
+
+body.underground .ground {
+  filter: brightness(0.5) saturate(0.4) hue-rotate(200deg);
+}
+
+/* The pipes themselves stay the same seven tubes --- underground just tints
+   them cooler and dimmer, the way the same pipe looks different lit from a
+   cave below instead of daylight above. */
+body.underground .grove {
+  filter: brightness(0.65) saturate(1.3) hue-rotate(190deg);
 }
 
 .mario-hint {
@@ -234,6 +279,7 @@ h1 {
   z-index: 2;
   pointer-events: none;
   will-change: transform;
+  transform-origin: bottom center;
 }
 
 .mario-cap {

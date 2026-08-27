@@ -4,6 +4,8 @@
 
 const NOTE_FREQS = [220.0, 246.94, 293.66, 329.63, 392.0, 440.0, 523.25];
 
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 let audioCtx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let dryGain: GainNode | null = null;
@@ -15,6 +17,12 @@ let windGain: GainNode | null = null;
 let waterSource: AudioBufferSourceNode | null = null;
 let waterFilter: BiquadFilterNode | null = null;
 let waterGain: GainNode | null = null;
+let muffleFilter: BiquadFilterNode | null = null;
+
+// Whether the whole page is currently in the underground room a pipe leads
+// to. Read by updateWind (ambience is quieter down there) and by the mario
+// hint's aria-live announcement; written only by setUnderground.
+let underground = false;
 
 function createReverbImpulse(ctx: AudioContext, seconds: number, decay: number): AudioBuffer {
   const length = Math.floor(ctx.sampleRate * seconds);
@@ -39,7 +47,14 @@ function ensureAudio(): AudioContext {
 
   masterGain = ctx.createGain();
   masterGain.gain.value = 0.85;
-  masterGain.connect(ctx.destination);
+
+  // Sits after everything else so going underground can muffle the whole
+  // mix, chimes and ambience alike, the way a cave mutes what's above it.
+  muffleFilter = ctx.createBiquadFilter();
+  muffleFilter.type = "lowpass";
+  muffleFilter.frequency.value = 18000;
+  masterGain.connect(muffleFilter);
+  muffleFilter.connect(ctx.destination);
 
   dryGain = ctx.createGain();
   dryGain.gain.value = 0.75;
@@ -123,10 +138,54 @@ function startWaterFlow(ctx: AudioContext): void {
 function updateWind(speed: number, verticalFraction: number): void {
   if (!windGain || !windFilter || !audioCtx) return;
   const now = audioCtx.currentTime;
-  const targetGain = Math.min(0.14, speed * 0.0006);
+  // There's no moving air underground, so a pointer drag there barely
+  // stirs anything rather than cutting the layer off outright.
+  const targetGain = Math.min(0.14, speed * 0.0006) * (underground ? 0.1 : 1);
   windGain.gain.setTargetAtTime(targetGain, now, 0.12);
   const targetFreq = 250 + (1 - verticalFraction) * 1100;
   windFilter.frequency.setTargetAtTime(targetFreq, now, 0.2);
+}
+
+// Ducks the pipe down into the cave below (or lifts it back out): mutes the
+// wind/water bed, muffles the whole mix, and leans the reverb wetter for a
+// cave's slap-back instead of the grove's open air. Called the instant a
+// down-press is recognised, so the audio and the visual crossfade together.
+function setUnderground(on: boolean): void {
+  underground = on;
+  if (!audioCtx || !muffleFilter || !waterGain || !wetGain) return;
+  const now = audioCtx.currentTime;
+  muffleFilter.frequency.setTargetAtTime(on ? 850 : 18000, now, 0.18);
+  waterGain.gain.setTargetAtTime(on ? 0.015 : 0.05, now, 0.3);
+  wetGain.gain.setTargetAtTime(on ? 0.65 : 0.4, now, 0.3);
+}
+
+// The pipe's own sound: a short pitch sweep standing in for the classic
+// Mario warp --- descending on the way down, ascending on the way back up.
+function playWarp(descending: boolean): void {
+  const ctx = ensureAudio();
+  const now = ctx.currentTime;
+  const duration = 0.32;
+
+  const sweep = ctx.createOscillator();
+  sweep.type = "square";
+  sweep.frequency.setValueAtTime(descending ? 720 : 140, now);
+  sweep.frequency.exponentialRampToValueAtTime(descending ? 140 : 720, now + duration);
+
+  const sweepFilter = ctx.createBiquadFilter();
+  sweepFilter.type = "lowpass";
+  sweepFilter.frequency.value = 2200;
+
+  const env = ctx.createGain();
+  env.gain.setValueAtTime(0.0001, now);
+  env.gain.linearRampToValueAtTime(0.22, now + 0.02);
+  env.gain.exponentialRampToValueAtTime(0.0005, now + duration);
+
+  sweep.connect(sweepFilter);
+  sweepFilter.connect(env);
+  env.connect(masterGain!);
+
+  sweep.start(now);
+  sweep.stop(now + duration + 0.05);
 }
 
 function strike(noteIndex: number, pan: number, intensity = 1): void {
@@ -388,20 +447,26 @@ function setupChimes(): void {
   function setupMario(): void {
     const marioEl = document.querySelector<HTMLElement>("#mario");
     if (!marioEl) return;
+    const modeStatus = document.querySelector<HTMLElement>("#mode-status");
 
     const width = 26;
     const gravity = 0.5;
     const manualJumpVelocity = 24; // tall enough to clear any pipe on this page
     const walkSpeed = 3;
+    // Matches playWarp's own sweep duration --- 0 for reduced motion, so the
+    // room still swaps but Mario doesn't visibly duck to get there.
+    const warpMs = reducedMotion ? 0 : 320;
 
     let x = 12;
     let y = 0;
     let vy = 0;
     let restingOn: HTMLButtonElement | null = null;
+    let downWasHeld = false;
+    let warpUntil = 0;
     const keys = new Set<string>();
 
     window.addEventListener("keydown", (event) => {
-      if (["ArrowLeft", "ArrowRight", "ArrowUp", " "].includes(event.key)) event.preventDefault();
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) event.preventDefault();
       keys.add(event.key);
     });
     window.addEventListener("keyup", (event) => keys.delete(event.key));
@@ -437,20 +502,39 @@ function setupChimes(): void {
       // hover asked Mario to go do.
       if (manualInput) marioTarget = null;
 
-      if (keys.has("ArrowLeft")) x -= walkSpeed;
-      if (keys.has("ArrowRight")) x += walkSpeed;
-
       const grounded = vy === 0;
-      if ((keys.has("ArrowUp") || keys.has(" ")) && grounded) {
-        vy = manualJumpVelocity;
-        restingOn = null;
+      const warping = performance.now() < warpUntil;
+
+      // Down on a pipe he's standing on toggles the room, in either
+      // direction --- edge-triggered on the keydown, not held, so a long
+      // press doesn't flip back and forth every frame it's down.
+      const downHeld = keys.has("ArrowDown");
+      if (downHeld && !downWasHeld && grounded && restingOn && !warping) {
+        marioTarget = null;
+        const entering = !underground;
+        warpUntil = performance.now() + warpMs;
+        setUnderground(entering);
+        playWarp(entering);
+        document.body.classList.toggle("underground", entering);
+        if (modeStatus) modeStatus.textContent = entering ? "Underground." : "Back on the surface.";
+      }
+      downWasHeld = downHeld;
+
+      if (!warping) {
+        if (keys.has("ArrowLeft")) x -= walkSpeed;
+        if (keys.has("ArrowRight")) x += walkSpeed;
+
+        if ((keys.has("ArrowUp") || keys.has(" ")) && grounded) {
+          vy = manualJumpVelocity;
+          restingOn = null;
+        }
       }
 
       // Hover dispatch: walk under the hovered pipe, then leap exactly high
       // enough to land on it once lined up. A pipe swapped mid-walk (the
       // mouse moved to a different one) just redirects Mario --- there's no
       // queue, only ever one live target.
-      if (!manualInput && marioTarget && grounded && restingOn !== marioTarget) {
+      if (!warping && !manualInput && marioTarget && grounded && restingOn !== marioTarget) {
         const targetRect = marioTarget.getBoundingClientRect();
         const targetCenter = targetRect.left + targetRect.width / 2 - groveRect.left;
         const desiredX = Math.max(0, Math.min(groveWidth - width, targetCenter - width / 2));
@@ -484,7 +568,16 @@ function setupChimes(): void {
         restingOn = support.chime;
       }
 
-      marioEl!.style.transform = `translate(${x}px, ${-y}px)`;
+      // Ducks him down into the pipe and back out over the warp window ---
+      // a single dip in scale, not the real Mario's screen-wipe, but the
+      // same idea of vanishing into the pipe rather than just teleporting.
+      if (warping) {
+        const progress = 1 - (warpUntil - performance.now()) / warpMs;
+        const squash = 1 - 0.85 * Math.sin(progress * Math.PI);
+        marioEl!.style.transform = `translate(${x}px, ${-y}px) scaleY(${squash})`;
+      } else {
+        marioEl!.style.transform = `translate(${x}px, ${-y}px)`;
+      }
       requestAnimationFrame(tick);
     }
 

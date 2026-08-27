@@ -6,7 +6,7 @@
     <title>Mario chimes</title>
     <meta
       name="description"
-      content="A wind chime you play with a mouse, a finger, a keyboard, or Mario — seven pipes over a Mario-style scene, tuned to a five-tone scale."
+      content="A wind chime you play with a mouse, a finger, a keyboard, or Mario — seven pipes over a Mario-style scene, tuned to a five-tone scale, with an underground mode a duck away."
     />
 
     <!--
@@ -32,8 +32,10 @@
       </nav>
       <h1>Mario chimes</h1>
       <p class="mario-hint">
-        Arrow keys to walk, Up/Space to jump onto a pipe --- or just hover a pipe and Mario will go jump on it himself.
+        Arrow keys to walk, Up/Space to jump onto a pipe, Down to duck into one and back --- or just hover a pipe and
+        Mario will go jump on it himself.
       </p>
+      <p id="mode-status" class="visually-hidden" aria-live="polite"></p>
     </header>
     <main>
       <div class="grove" id="grove" aria-label="Seven pipes, tuned to a five-tone scale" role="group">
