@@ -1,16 +1,276 @@
+:root {
+  --paper: #f2ede1;
+  --ink: #2a2825;
+  --ink-soft: #5b574e;
+  --seal: #a8341f;
+  --sky-top: #bfe3ff;
+  --sky-bottom: #eef8ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  padding: 2rem;
-  font-family: system-ui, sans-serif;
+  padding: 0;
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", cursive, sans-serif;
   line-height: 1.6;
-  color: #1a1a1a;
+  color: var(--ink);
+  /* A sun in the corner, two loose cumulus clusters (each a handful of
+     overlapping ellipses) drifting near the top, over a soft sky gradient
+     --- pure CSS, no image. */
+  background:
+    radial-gradient(38px 38px at 92% 9%, #fff6c2 0%, #ffdd57 55%, transparent 72%),
+    radial-gradient(46px 22px at 12% 20%, #fff 60%, transparent 62%),
+    radial-gradient(64px 30px at 19% 24%, #fff 60%, transparent 62%),
+    radial-gradient(40px 20px at 27% 18%, #fff 60%, transparent 62%),
+    radial-gradient(56px 26px at 62% 10%, #fff 60%, transparent 62%),
+    radial-gradient(42px 20px at 68% 14%, #fff 60%, transparent 62%),
+    linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  padding: 1rem 1.5rem 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+nav {
+  align-self: stretch;
+  text-align: left;
+}
+
+nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+nav a:hover,
+nav a:focus-visible {
+  color: var(--seal);
 }
 
 main {
-  max-width: 40rem;
-  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  gap: 0.75rem;
 }
 
-a {
-  color: #0b5fff;
+h1 {
+  margin: 0;
+  font-family: "Press Start 2P", "Comic Sans MS", cursive, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  color: var(--seal);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15);
+}
+
+.grove {
+  position: relative;
+  width: min(90vw, 62rem);
+  height: min(58vh, 30rem);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
+  padding: 0 clamp(0.5rem, 4vw, 3rem) 1.5rem;
+  touch-action: none;
+  overflow: visible;
+}
+
+.ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5rem;
+  background: linear-gradient(to bottom, #8bd450 0%, #8bd450 30%, #b97a3f 30%, #b97a3f 100%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  z-index: 0;
+}
+
+.mario-hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.chime {
+  position: relative;
+  flex: 1;
+  height: var(--h, 100%);
+  min-width: 0;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    var(--tube) 0%,
+    var(--tube) 70%,
+    var(--tube-deep) 100%
+  );
+  transition:
+    box-shadow 0.4s ease-out,
+    filter 0.2s ease-out;
+  box-shadow: inset 0 0 0 0 rgba(255, 255, 255, 0.9);
+}
+
+/* The wider collar at the mouth of a Mario pipe --- a short, overhanging cap
+   sitting on top of the narrower body, in the same hue two shades deeper. */
+.chime::before {
+  content: "";
+  position: absolute;
+  top: -0.7rem;
+  left: -0.35rem;
+  right: -0.35rem;
+  height: 0.9rem;
+  background: var(--tube-deep);
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+}
+
+.chime[data-note="0"] {
+  --tube: #ffadad;
+  --tube-deep: #ec8b8b;
+}
+
+.chime[data-note="1"] {
+  --tube: #ffd6a5;
+  --tube-deep: #f4b877;
+}
+
+.chime[data-note="2"] {
+  --tube: #fdffb6;
+  --tube-deep: #e6e88c;
+}
+
+.chime[data-note="3"] {
+  --tube: #caffbf;
+  --tube-deep: #9fe89a;
+}
+
+.chime[data-note="4"] {
+  --tube: #9bf6ff;
+  --tube-deep: #6cd9e6;
+}
+
+.chime[data-note="5"] {
+  --tube: #a0c4ff;
+  --tube-deep: #7aa3f2;
+}
+
+.chime[data-note="6"] {
+  --tube: #bdb2ff;
+  --tube-deep: #988ae8;
+}
+
+.chime:hover {
+  filter: brightness(1.08);
+}
+
+.chime:focus-visible {
+  outline: 2px solid var(--seal);
+  outline-offset: 4px;
+}
+
+.chime.struck {
+  box-shadow: inset 0 -2rem 1.5rem -1rem rgba(255, 255, 255, 0.9);
+}
+
+.chime.knock {
+  /* A tube mid-knock is moving under the cursor by design --- without this,
+     a resting pointer can end up newly "entering" the shifted hit box and
+     hover-to-play reads that as a fresh strike, which knocks on again. */
+  pointer-events: none;
+  animation: knock 0.25s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* A single lean-and-settle, not a repeating swing: one displacement toward
+   --knock-x and back, standing in for the tube getting bumped. */
+@keyframes knock {
+  0% {
+    transform: translateX(0);
+  }
+  35% {
+    transform: translateX(var(--knock-x, 6px));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+#mario {
+  position: absolute;
+  left: 0;
+  bottom: 1.5rem;
+  width: 1.6rem;
+  height: 1.9rem;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.mario-cap {
+  position: absolute;
+  top: 0;
+  left: -0.15rem;
+  right: -0.15rem;
+  height: 0.5rem;
+  background: #e0342d;
+  border-radius: 3px 3px 0 0;
+}
+
+.mario-face {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.1rem;
+  right: 0.1rem;
+  height: 0.55rem;
+  background: #ffc89a;
+}
+
+.mario-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0.95rem;
+  background: #1e5fd6;
+  border-radius: 0 0 2px 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chime {
+    transition: none;
+  }
+
+  .chime.knock {
+    animation: none;
+  }
 }
