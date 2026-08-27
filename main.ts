@@ -147,18 +147,22 @@ function updateWind(speed: number, verticalFraction: number): void {
 }
 
 // The underground theme's signature: a low note repeated in pairs, three
-// times, then a beat of quiet before the cycle turns over --- "duh-duh
-// duh-duh duh-duh". Built on the chimes' own lowest tone dropped an octave
-// rather than a transcription of Kondo's actual melody, so the cave hums in
-// the instrument's own tuning instead of quoting the theme note-for-note.
-const MOTIF_PATTERN = [1, 1, 1, 1, 1, 1, 0, 0];
-const MOTIF_TEMPO_BPM = 147;
+// times, at a clip fast enough to feel like it's scurrying rather than
+// strolling --- the underground theme's actual character, which is a
+// relentless, churning trill low in the register, not a slow tolling
+// phrase. The pitches are semitone offsets from the chimes' own lowest
+// tone dropped an octave, not a transcription of Kondo's melody, so the
+// cave hums a run in the instrument's own voice rather than quoting the
+// theme note-for-note.
+const MOTIF_SEMITONES = [0, 0, 3, 0, 0, 3, 5, 3];
+const MOTIF_TEMPO_BPM = 190;
+const MOTIF_SUBDIVISION = 4; // 16th notes at MOTIF_TEMPO_BPM
 let motifTimer: ReturnType<typeof setTimeout> | null = null;
 let motifStep = 0;
 
-function playMotifNote(ctx: AudioContext, accent: boolean): void {
+function playMotifNote(ctx: AudioContext, semitones: number, accent: boolean): void {
   const now = ctx.currentTime;
-  const freq = NOTE_FREQS[0] / 2;
+  const freq = (NOTE_FREQS[0] / 2) * 2 ** (semitones / 12);
 
   const osc = ctx.createOscillator();
   osc.type = "square";
@@ -166,34 +170,32 @@ function playMotifNote(ctx: AudioContext, accent: boolean): void {
 
   const filter = ctx.createBiquadFilter();
   filter.type = "lowpass";
-  filter.frequency.value = 900;
+  filter.frequency.value = 1400;
   filter.Q.value = 1.2;
 
-  // A muted "duh", not a ringing tone --- decayed almost fully before the
-  // next eighth note lands, with every first note of a pair sitting a touch
-  // louder and longer than the one right after it (the "duh-DUH" swing).
+  // A short, dry pluck rather than a ringing tone --- decayed almost fully
+  // before the next 16th note lands, so a fast run stays a run instead of
+  // smearing into a drone.
   const env = ctx.createGain();
   env.gain.setValueAtTime(0.0001, now);
-  env.gain.linearRampToValueAtTime(accent ? 0.22 : 0.15, now + 0.008);
-  env.gain.exponentialRampToValueAtTime(0.0005, now + (accent ? 0.16 : 0.11));
+  env.gain.linearRampToValueAtTime(accent ? 0.22 : 0.15, now + 0.004);
+  env.gain.exponentialRampToValueAtTime(0.0005, now + 0.05);
 
   osc.connect(filter);
   filter.connect(env);
   env.connect(masterGain!);
 
   osc.start(now);
-  osc.stop(now + 0.2);
+  osc.stop(now + 0.06);
 }
 
 function scheduleMotifStep(): void {
   if (!underground || !audioCtx) return;
-  const step = motifStep % MOTIF_PATTERN.length;
-  if (MOTIF_PATTERN[step]) {
-    playMotifNote(audioCtx, step % 2 === 0);
-  }
+  const step = motifStep % MOTIF_SEMITONES.length;
+  playMotifNote(audioCtx, MOTIF_SEMITONES[step], step % 2 === 0);
   motifStep++;
-  const eighthNoteMs = 60_000 / MOTIF_TEMPO_BPM / 2;
-  motifTimer = setTimeout(scheduleMotifStep, eighthNoteMs);
+  const stepMs = 60_000 / MOTIF_TEMPO_BPM / MOTIF_SUBDIVISION;
+  motifTimer = setTimeout(scheduleMotifStep, stepMs);
 }
 
 function stopMotif(): void {
