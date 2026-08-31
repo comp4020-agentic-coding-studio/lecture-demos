@@ -80,6 +80,24 @@ So, in this repo:
 - **credit travels with the code.** When the artefact is replaced, update the
   attribution in `README.md` in the same commit.
 
+## Reading the shipped transcripts
+
+Some beats read this repo's own past sessions back. The shipped transcripts live
+in the aggregated tree at `~/claude-logs/<host>/<project-dir>/` on weddle
+(reached over ssh from any other machine); this repo's sessions are the
+directories whose names end `-comp4020-lecture-demos`.
+
+So, in this repo:
+
+- read transcripts only from the `*-comp4020-lecture-demos` directories under
+  `~/claude-logs`. Everything else in that tree is out of bounds: other
+  projects' sessions are private, and they never appear on a projector.
+- treat the transcripts as read-only evidence. Quote them, cite the session
+  file, and change nothing under `~/claude-logs`.
+- if the tree can't be reached, say so and stop. Don't go looking for session
+  files anywhere else (`~/.claude` included); the aggregated tree is the only
+  sanctioned corpus, and whether to proceed without it is the convenor's call.
+
 ## Template contract
 
 Keep the starter's static-site contract intact unless a lecture explicitly
