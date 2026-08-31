@@ -100,18 +100,17 @@ So, in this repo:
 
 ## Reading the convenor's dotfiles
 
-Some beats ask what the convenor's own harness history shows. That repository is
-public — [benswift/.dotfiles](https://github.com/benswift/.dotfiles) — and
-checked out at `~/.dotfiles` on the demo machines.
+Some beats ask what the convenor's own harness history shows. Clone it fresh —
+`git clone https://github.com/benswift/.dotfiles` into a temporary directory
+outside this repo — and read that copy. Never read the live `~/.dotfiles`
+checkout: the fresh clone holds only what is already public, so nothing reaches
+the projector that a student couldn't clone themselves.
 
 So, in this repo:
 
-- read `~/.dotfiles` freely: the log, the diffs and the file contents are all
-  fair game on a projector, and `gh` reaches the same history if the local
-  checkout isn't there.
-- treat it as read-only. Quote and cite commits, change nothing, and don't offer
-  edits to it mid-demo: corrections to the convenor's harness are his own
-  compound step, made outside the lecture.
+- the clone's log, diffs and file contents are all fair game on a projector.
+- the clone is disposable evidence. Quote and cite commits, and copy nothing
+  from it into this repo unless asked.
 
 ## Template contract
 
