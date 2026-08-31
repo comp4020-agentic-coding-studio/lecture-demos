@@ -98,6 +98,21 @@ So, in this repo:
   files anywhere else (`~/.claude` included); the aggregated tree is the only
   sanctioned corpus, and whether to proceed without it is the convenor's call.
 
+## Reading the convenor's dotfiles
+
+Some beats ask what the convenor's own harness history shows. That repository is
+public — [benswift/.dotfiles](https://github.com/benswift/.dotfiles) — and
+checked out at `~/.dotfiles` on the demo machines.
+
+So, in this repo:
+
+- read `~/.dotfiles` freely: the log, the diffs and the file contents are all
+  fair game on a projector, and `gh` reaches the same history if the local
+  checkout isn't there.
+- treat it as read-only. Quote and cite commits, change nothing, and don't offer
+  edits to it mid-demo: corrections to the convenor's harness are his own
+  compound step, made outside the lecture.
+
 ## Template contract
 
 Keep the starter's static-site contract intact unless a lecture explicitly
