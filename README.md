@@ -22,7 +22,7 @@ instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
 There is no artefact in the tree right now: it sits at the course's static
 prototype starter, tracking
 [template-static](https://github.com/comp4020-agentic-coding-studio/template-static)
-at `6f0a351` — the same starter a new prototype repo gets, plus this repo's own
+at `2ee5740` — the same starter a new prototype repo gets, plus this repo's own
 harness on top. Week 5's Mario chimes, vendored from a crit-4 hall-of-fame pick,
 went out with the week it was built for.
 
