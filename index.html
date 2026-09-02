@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mario chimes</title>
+    <title>COMP4020 prototype</title>
     <meta
       name="description"
-      content="A wind chime you play with a mouse, a finger, a keyboard, or Mario — seven pipes over a Mario-style scene, tuned to a five-tone scale, with an underground mode a duck away."
+      content="Replace this with one sentence saying what this page is. A search result and a link preview both show it."
     />
 
     <!--
@@ -18,41 +18,20 @@
     <meta property="og:image" content="./card.png" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Heading-only display face; body text stays in the Comic Sans stack. -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header>
       <nav aria-label="Primary">
-        <a href="./">Mario chimes</a>
+        <a href="./">Home</a>
       </nav>
-      <h1>Mario chimes</h1>
-      <p class="mario-hint">
-        Arrow keys to walk, Up/Space to jump onto a pipe, Down to duck into one and back --- or just hover a pipe and
-        Mario will go jump on it himself.
-      </p>
-      <p id="mode-status" class="visually-hidden" aria-live="polite"></p>
     </header>
     <main>
-      <div class="grove" id="grove" aria-label="Seven pipes, tuned to a five-tone scale" role="group">
-        <div class="ground" aria-hidden="true"></div>
-        <button class="chime" type="button" data-note="0" style="--h: 88%" aria-label="Chime 1 of 7, lowest tone"></button>
-        <button class="chime" type="button" data-note="1" style="--h: 96%" aria-label="Chime 2 of 7"></button>
-        <button class="chime" type="button" data-note="2" style="--h: 78%" aria-label="Chime 3 of 7"></button>
-        <button class="chime" type="button" data-note="3" style="--h: 100%" aria-label="Chime 4 of 7, middle tone"></button>
-        <button class="chime" type="button" data-note="4" style="--h: 72%" aria-label="Chime 5 of 7"></button>
-        <button class="chime" type="button" data-note="5" style="--h: 90%" aria-label="Chime 6 of 7"></button>
-        <button class="chime" type="button" data-note="6" style="--h: 66%" aria-label="Chime 7 of 7, highest tone"></button>
-        <div id="mario" aria-hidden="true">
-          <div class="mario-cap"></div>
-          <div class="mario-face"></div>
-          <div class="mario-body"></div>
-        </div>
-      </div>
+      <h1>COMP4020 prototype</h1>
+      <p>
+        Replace this with your prototype. This week's brief is on the course website;
+        <code>spec/README.md</code> explains how the checks in this repo relate to it.
+      </p>
     </main>
     <script type="module" src="./main.ts"></script>
   </body>

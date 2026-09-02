@@ -19,12 +19,12 @@ from its public repo, so a lecture starts from something that already works
 instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
 `spec/`, the CI workflow and the build tooling — accumulates all semester.
 
-The artefact in the tree right now is
-[Mario chimes](https://github.com/comp4020-agentic-coding-studio/comp4020-riff4-yunlin-1)
-(`c487b1c`), a wind chime you play with a mouse, a finger, a keyboard, or Mario
-— seven pipes over a Mario-style scene, tuned to a five-tone scale. It is here
-because it is good. Whatever the lecture does to it is a demonstration of the
-loop and says nothing about the work.
+There is no artefact in the tree right now: it sits at the course's static
+prototype starter, tracking
+[template-static](https://github.com/comp4020-agentic-coding-studio/template-static)
+at `6f0a351` — the same starter a new prototype repo gets, plus this repo's own
+harness on top. Week 5's Mario chimes, vendored from a crit-4 hall-of-fame pick,
+went out with the week it was built for.
 
 ## Follow along
 
@@ -56,5 +56,5 @@ lecture's reset.
 
 The demo runs the same checks as the student starter: `pnpm check` covers the
 typecheck, the build and the tests. The stack underneath is whatever the current
-artefact brought with it — Mario chimes, at the moment, stays on the starter's
-own: Vite over hand-written HTML, CSS and TypeScript.
+artefact brought with it — at the baseline, that is the starter's own: Vite over
+hand-written HTML, CSS and TypeScript.
