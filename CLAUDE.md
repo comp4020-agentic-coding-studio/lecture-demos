@@ -98,6 +98,22 @@ So, in this repo:
   files anywhere else (`~/.claude` included); the aggregated tree is the only
   sanctioned corpus, and whether to proceed without it is the convenor's call.
 
+## The whole archive, in aggregate
+
+`~/claude-logs/analytics.db` on weddle summarises every shipped session from
+every host and agent --- paths, project names, git branch, agent version,
+timestamps, message counts, and no message content. `bin/ingest-claude-logs` in
+the convenor's dotfiles builds it.
+
+So, in this repo:
+
+- the database is fair game on a projector, and it is the only sanctioned way to
+  ask something that spans projects other than this one.
+- it is not a way around the rule above. A session file it points at is still
+  out of bounds unless that path is a `*-comp4020-lecture-demos` one.
+- project names are the sensitive field. Aggregate over them, and name one on a
+  projector only when asked.
+
 ## Reading the convenor's dotfiles
 
 Some beats ask what the convenor's own harness history shows. Clone it fresh —
