@@ -9,7 +9,6 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "check": "pnpm typecheck && pnpm build && vitest run",
-    "check:evidence": "node scripts/check-evidence.ts",
     "test": "vitest run"
   },
   "devDependencies": {
