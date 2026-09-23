@@ -1,3 +1,18 @@
-# esbuild (used by Vite) needs its postinstall to set up its native binary.
+# esbuild (used by Vite/Astro) needs its postinstall to set up its native
+# binary; better-sqlite3 fetches its prebuilt binding the same way.
 allowBuilds:
   esbuild: true
+  better-sqlite3: true
+# pnpm's minimum-release-age setting would otherwise block installing this
+# freshly released version. Pinned exact (pnpm's exclusion list takes exact
+# versions or `||`-joined exact versions, not semver ranges, so this can't
+# just track package.json's ^0.9.10) --- bump it alongside that dependency.
+minimumReleaseAgeExclude:
+  - '@astrojs/check@0.9.10'
+
+# drizzle-kit still drags in the deprecated @esbuild-kit/* loader chain, which
+# pins esbuild ~0.18.20 (GHSA-67mh-4wv8-2f99). It only ever calls
+# esbuild.transformSync, so pointing it at the 0.25 that drizzle-kit already
+# depends on directly both clears the advisory and drops a duplicate esbuild.
+overrides:
+  '@esbuild-kit/core-utils>esbuild': '^0.25.12'

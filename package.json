@@ -1,22 +1,32 @@
 {
-  "name": "comp4020-static-prototype",
+  "name": "comp4020-dynamic-prototype",
   "private": true,
   "type": "module",
   "scripts": {
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm build && vitest run",
-    "test": "vitest run"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "check": "pnpm typecheck && pnpm test",
+    "test": "astro build && vitest run",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@astrojs/node": "^11.1.6",
+    "astro": "^7.3.3",
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/markdown-satteri": "0.4.1",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/jsdom": "^30.0.0",
-    "@types/node": "^26.6.2",
+    "axe-core": "^4.13.0",
+    "drizzle-kit": "^0.31.10",
     "jsdom": "^30.1.0",
     "typescript": "^6.0.3",
-    "vite": "^8.1.5",
     "vitest": "^5.0.1"
   },
   "engines": {
