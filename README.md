@@ -41,9 +41,9 @@ empty and never touches the deployed one.
 
 ## Check-ins
 
-Three times a lecture the slides stop and you take the demo over: what the agent
-has done gets revealed on the projector, and one "yes, and" from you — the
-premise set at the launch, pushed further — is typed in and run. There is
+At points during the lecture the slides stop and you take the demo over: what
+the agent has done gets revealed on the projector, and one "yes, and" from you —
+the premise set at the launch, pushed further — is typed in and run. There is
 nothing to prepare and no blank to fill in — half a minute with the person next
 to you, then call it out.
 
