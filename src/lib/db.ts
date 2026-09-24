@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import Database from "better-sqlite3";
-import { desc } from "drizzle-orm";
+import { asc, count, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { type Message, messages } from "./schema";
@@ -26,10 +26,32 @@ migrate(db, { migrationsFolder: "./drizzle" });
 
 export type { Message };
 
-export function listMessages(): Message[] {
-  return db.select().from(messages).orderBy(desc(messages.id)).limit(50).all();
+export const DEFAULT_TOPIC = "general";
+
+// Topics are free text, folded to one canonical spelling so "Cats", " cats "
+// and "CATS" all file under the same topic.
+export function normaliseTopic(raw: string): string {
+  const topic = raw.trim().toLowerCase().replace(/\s+/g, " ").slice(0, 40);
+  return topic || DEFAULT_TOPIC;
 }
 
-export function addMessage(body: string): Message {
-  return db.insert(messages).values({ body }).returning().get();
+export function listMessages(topic?: string): Message[] {
+  const query = db.select().from(messages);
+  return (topic ? query.where(eq(messages.topic, topic)) : query)
+    .orderBy(desc(messages.id))
+    .limit(50)
+    .all();
+}
+
+export function listTopics(): { topic: string; count: number }[] {
+  return db
+    .select({ topic: messages.topic, count: count() })
+    .from(messages)
+    .groupBy(messages.topic)
+    .orderBy(asc(messages.topic))
+    .all();
+}
+
+export function addMessage(body: string, topic: string): Message {
+  return db.insert(messages).values({ body, topic }).returning().get();
 }

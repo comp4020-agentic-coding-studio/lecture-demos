@@ -1,8 +1,12 @@
 ---
-import { listMessages } from "../lib/db";
+import { DEFAULT_TOPIC, listMessages, listTopics, normaliseTopic } from "../lib/db";
 import "../styles.css";
 
-const messages = listMessages();
+const param = Astro.url.searchParams.get("topic");
+const filter = param ? normaliseTopic(param) : undefined;
+const messages = listMessages(filter);
+const topics = listTopics();
+const topicHref = (topic: string) => `/?topic=${encodeURIComponent(topic)}`;
 ---
 
 <!doctype html>
@@ -29,10 +33,43 @@ const messages = listMessages();
       <form method="post" action="/api/messages">
         <label for="body">Leave a message</label>
         <input id="body" name="body" required maxlength="500" />
+        <label for="topic">Topic</label>
+        <input
+          id="topic"
+          name="topic"
+          list="topic-options"
+          maxlength="40"
+          placeholder={DEFAULT_TOPIC}
+          value={filter ?? ""}
+        />
+        <datalist id="topic-options">
+          {topics.map(({ topic }) => <option value={topic} />)}
+        </datalist>
+        {filter && <input type="hidden" name="filter" value={filter} />}
         <button>Sign</button>
       </form>
-      <ul id="messages">
-        {messages.map((message) => <li>{message.body}</li>)}
+      <nav aria-label="topics" class="topics">
+        <a href="/" aria-current={filter ? undefined : "page"}>all</a>
+        {
+          topics.map(({ topic, count }) => (
+            <a href={topicHref(topic)} aria-current={topic === filter ? "page" : undefined}>
+              {topic} <span class="count">{count}</span>
+            </a>
+          ))
+        }
+      </nav>
+      <h2>{filter ? `Messages about ${filter}` : "All messages"}</h2>
+      <ul id="messages" data-filter={filter ?? ""}>
+        {
+          messages.map((message) => (
+            <li>
+              <a class="topic" href={topicHref(message.topic)}>
+                {message.topic}
+              </a>
+              <span class="body">{message.body}</span>
+            </li>
+          ))
+        }
       </ul>
     </main>
     <script>
@@ -40,12 +77,22 @@ const messages = listMessages();
       // messages as they arrive. The form itself needs none of this — its
       // POST + redirect re-renders the submitting tab from SQLite; this
       // stream is how every other tab finds out.
-      const list = document.querySelector("#messages");
+      // Only messages in the topic being viewed are shown.
+      const list = document.querySelector<HTMLElement>("#messages");
+      const filter = list?.dataset.filter;
       const source = new EventSource("/api/events");
       source.addEventListener("message", (event) => {
         const message = JSON.parse(event.data);
+        if (filter && message.topic !== filter) return;
         const item = document.createElement("li");
-        item.textContent = message.body;
+        const topic = document.createElement("a");
+        topic.className = "topic";
+        topic.href = `/?topic=${encodeURIComponent(message.topic)}`;
+        topic.textContent = message.topic;
+        const body = document.createElement("span");
+        body.className = "body";
+        body.textContent = message.body;
+        item.append(topic, body);
         list?.prepend(item);
       });
     </script>

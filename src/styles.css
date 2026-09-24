@@ -35,6 +35,25 @@ button {
   font: inherit;
 }
 
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.topics a[aria-current="page"] {
+  font-weight: bold;
+}
+
+.count {
+  opacity: 0.6;
+}
+
 #messages {
   padding-inline-start: 1.2rem;
+}
+
+#messages .topic {
+  margin-inline-end: 0.5rem;
+  font-size: 0.85em;
 }

@@ -10,6 +10,7 @@ import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 export const messages = sqliteTable("messages", {
   id: int().primaryKey({ autoIncrement: true }),
   body: text().notNull(),
+  topic: text().notNull().default("general"),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(datetime('now'))`),

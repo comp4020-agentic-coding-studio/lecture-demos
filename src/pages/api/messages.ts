@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { addMessage } from "../../lib/db";
+import { addMessage, normaliseTopic } from "../../lib/db";
 import { bus } from "../../lib/events";
 
 // The write half of the demo: a plain HTML form POSTs here, the message goes
@@ -10,8 +10,11 @@ import { bus } from "../../lib/events";
 export const POST: APIRoute = async ({ request, redirect }) => {
   const form = await request.formData();
   const body = String(form.get("body") ?? "").trim();
+  const topic = normaliseTopic(String(form.get("topic") ?? ""));
   if (body) {
-    bus.emit("message", addMessage(body.slice(0, 500)));
+    bus.emit("message", addMessage(body.slice(0, 500), topic));
   }
-  return redirect("/", 303);
+  // a post from a filtered view lands back on that view
+  const filter = String(form.get("filter") ?? "").trim();
+  return redirect(filter ? `/?topic=${encodeURIComponent(normaliseTopic(filter))}` : "/", 303);
 };
