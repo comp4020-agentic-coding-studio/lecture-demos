@@ -1,5 +1,6 @@
 ---
 import { DEFAULT_TOPIC, listMessages, listTopics, normaliseTopic } from "../lib/db";
+import { topicHue } from "../lib/hue";
 import "../styles.css";
 
 const param = Astro.url.searchParams.get("topic");
@@ -7,6 +8,11 @@ const filter = param ? normaliseTopic(param) : undefined;
 const messages = listMessages(filter);
 const topics = listTopics();
 const topicHref = (topic: string) => `/?topic=${encodeURIComponent(topic)}`;
+const hueStyle = (topic: string) => `--hue: ${topicHue(topic)}`;
+
+// the spinning cube wears the six busiest topics, padded out with the default
+const CUBE_FACES = ["front", "back", "right", "left", "top", "bottom"];
+const cubeTopics = [...topics].sort((a, b) => b.count - a.count).map(({ topic }) => topic);
 ---
 
 <!doctype html>
@@ -17,12 +23,24 @@ const topicHref = (topic: string) => `/?topic=${encodeURIComponent(topic)}`;
     <title>COMP4020 prototype</title>
   </head>
   <body>
+    <div class="scenery" aria-hidden="true">
+      <div class="floor"></div>
+      <div class="cube">
+        {
+          CUBE_FACES.map((face, i) => (
+            <div class={`face ${face}`} style={hueStyle(cubeTopics[i] ?? DEFAULT_TOPIC)}>
+              {cubeTopics[i] ?? DEFAULT_TOPIC}
+            </div>
+          ))
+        }
+      </div>
+    </div>
     <nav aria-label="site">
       <a href="/">Guestbook</a>
       <a href="/readme/">About</a>
     </nav>
     <main>
-      <h1>Guestbook</h1>
+      <h1 data-text="Guestbook">Guestbook</h1>
       <p>
         A minimal full-stack starter: messages live in SQLite on the machine's
         volume (state survives a reload and a redeploy), and new messages
@@ -52,7 +70,11 @@ const topicHref = (topic: string) => `/?topic=${encodeURIComponent(topic)}`;
         <a href="/" aria-current={filter ? undefined : "page"}>all</a>
         {
           topics.map(({ topic, count }) => (
-            <a href={topicHref(topic)} aria-current={topic === filter ? "page" : undefined}>
+            <a
+              href={topicHref(topic)}
+              style={hueStyle(topic)}
+              aria-current={topic === filter ? "page" : undefined}
+            >
               {topic} <span class="count">{count}</span>
             </a>
           ))
@@ -61,8 +83,8 @@ const topicHref = (topic: string) => `/?topic=${encodeURIComponent(topic)}`;
       <h2>{filter ? `Messages about ${filter}` : "All messages"}</h2>
       <ul id="messages" data-filter={filter ?? ""}>
         {
-          messages.map((message) => (
-            <li>
+          messages.map((message, i) => (
+            <li style={`${hueStyle(message.topic)}; --i: ${i}`}>
               <a class="topic" href={topicHref(message.topic)}>
                 {message.topic}
               </a>
@@ -73,6 +95,20 @@ const topicHref = (topic: string) => `/?topic=${encodeURIComponent(topic)}`;
       </ul>
     </main>
     <script>
+      import { topicHue } from "../lib/hue";
+
+      // The whole stage leans toward the pointer. Reduced-motion users get a
+      // page that stays put.
+      const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const root = document.documentElement;
+      window.addEventListener("pointermove", (event) => {
+        if (still.matches) return;
+        const x = event.clientX / window.innerWidth - 0.5;
+        const y = event.clientY / window.innerHeight - 0.5;
+        root.style.setProperty("--tilt-x", `${(-y * 10).toFixed(2)}deg`);
+        root.style.setProperty("--tilt-y", `${(x * 14).toFixed(2)}deg`);
+      });
+
       // The live half of the demo: subscribe to the SSE stream and prepend
       // messages as they arrive. The form itself needs none of this — its
       // POST + redirect re-renders the submitting tab from SQLite; this
@@ -85,6 +121,8 @@ const topicHref = (topic: string) => `/?topic=${encodeURIComponent(topic)}`;
         const message = JSON.parse(event.data);
         if (filter && message.topic !== filter) return;
         const item = document.createElement("li");
+        item.style.setProperty("--hue", String(topicHue(message.topic)));
+        item.classList.add("arriving");
         const topic = document.createElement("a");
         topic.className = "topic";
         topic.href = `/?topic=${encodeURIComponent(message.topic)}`;
