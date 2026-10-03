@@ -2,7 +2,7 @@ defmodule LectureDemos.Board.Message do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "messages" do
+  schema "board_messages" do
     field :body, :string
 
     timestamps(type: :utc_datetime)
