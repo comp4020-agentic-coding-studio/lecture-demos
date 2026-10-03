@@ -89,9 +89,11 @@ jobs:
           echo "site did not return 200"; exit 1
       - name: Verify the LiveView socket upgrades
         # a page's live half runs over a WebSocket at /live/websocket; a
-        # same-origin upgrade is answered 101 Switching Protocols
+        # same-origin upgrade is answered 101 Switching Protocols. --http1.1
+        # because the upgrade is an HTTP/1.1 mechanism: over Fly's TLS, curl
+        # would otherwise negotiate HTTP/2 and get a 400
         run: |
-          code=$(curl -s -o /dev/null -w "%{http_code}" -m 15 \
+          code=$(curl --http1.1 -s -o /dev/null -w "%{http_code}" -m 15 \
             -H "Connection: Upgrade" -H "Upgrade: websocket" \
             -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
             -H "Origin: $APP_URL" "$APP_URL/live/websocket?vsn=2.0.0" || true)
@@ -107,7 +109,7 @@ jobs:
         # Phoenix's check_origin: a WebSocket opened from a foreign Origin must
         # be refused, or any site could act as a visitor here.
         run: |
-          code=$(curl -s -o /dev/null -w "%{http_code}" -m 15 \
+          code=$(curl --http1.1 -s -o /dev/null -w "%{http_code}" -m 15 \
             -H "Connection: Upgrade" -H "Upgrade: websocket" \
             -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
             -H "Origin: https://cross-site.example.com" "$APP_URL/live/websocket?vsn=2.0.0" || true)
