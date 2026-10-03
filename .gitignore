@@ -1,7 +1,12 @@
 node_modules/
-dist/
-.astro/
 *.log
+
+# Elixir build output, fetched deps, and the assets the build writes
+/_build/
+/deps/
+/priv/static/assets/
+/priv/static/cache_manifest.json
+erl_crash.dump
 
 # editor and OS junk
 .DS_Store
@@ -11,6 +16,8 @@ Desktop.ini
 
 # the local dev database — state on your machine, never in the repo
 .data/
+*.db
+*.db-*
 
 # keep secrets out of the repo: your API key lives in an env var or an
 # untracked file, never in a tracked one

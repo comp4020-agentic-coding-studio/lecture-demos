@@ -20,9 +20,9 @@ you build it and whatever the week's brief asks: a navigation landmark, exactly
 one top-level heading, a document language, a real title, a mobile viewport, alt
 text on images — plus an automated **accessibility floor**: axe-core's rule set,
 run on each page's served HTML. They run against the **running** app —
-`global-setup.ts` boots the built server (`dist/server/entry.mjs`, the same
-artefact production runs) with a throwaway database — so they check what
-actually ships. Keep them green; don't delete them.
+`global-setup.ts` boots the built release (`_build/prod/rel/`, the same artefact
+production runs) with a throwaway database — so they check what actually ships.
+Keep them green; don't delete them.
 
 Two things to know about how they see your app:
 
@@ -41,13 +41,12 @@ whole of `README.md`, your account of what the app is and what good looks like
 here. It renders the markdown to text and asks whether the served page contains
 all of it, so styling and navigation around it pass and a trimmed copy fails.
 
-## The starter's plumbing (shipped, retires with the starter)
+## The artefact's own tests (retire with the artefact)
 
-`guestbook.test.ts` drives the running app over HTTP to prove the supplied
-plumbing works in this repo: a message survives a reload, and a new one reaches
-other clients over the SSE stream. A red run on a fresh clone means the platform
-is broken, not your work. It describes the starter, so it goes when the starter
-does.
+The app's own tests live with its stack, not here: from Week 9 that's `test/`,
+run by `mix test`, where `Phoenix.LiveViewTest` proves the board's two platform
+claims — a message survives a reload, and one posted in one tab reaches another.
+They describe this artefact, so they go when it does.
 
 ## The week's spec tests (written live)
 

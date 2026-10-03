@@ -1,1 +1,0 @@
-ALTER TABLE `messages` ADD `topic` text DEFAULT 'general' NOT NULL;

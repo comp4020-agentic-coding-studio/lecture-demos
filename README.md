@@ -12,18 +12,22 @@ prototype template, then is worked in week by week through the semester.
 
 ## Two layers, two clocks
 
-The **artefact** — the site under `src/`, and whatever tests came with it — is
-replaced most weeks, and from Week 3 on it is usually vendored rather than
-written here: a hall-of-fame prototype from the previous crit, copied in whole
-from its public repo, so a lecture starts from something that already works
-instead of from a blank page. The **harness** — `CLAUDE.md`, the invariants in
-`spec/`, the CI workflow and the build tooling — accumulates all semester.
+The **artefact** — the app itself, and whatever tests came with it — is replaced
+most weeks, and from Week 3 on it is usually vendored rather than written here:
+a hall-of-fame prototype from the previous crit, copied in whole from its public
+repo, so a lecture starts from something that already works instead of from a
+blank page. The **harness** — `CLAUDE.md`, the invariants in `spec/`, the CI
+workflow and the build tooling — accumulates all semester.
 
 From Week 7 the tree is the course's full-stack starter,
 [template-dynamic](https://github.com/comp4020-agentic-coding-studio/template-dynamic)
 at `5e2c1b1`, plus this repo's own harness on top: the same guestbook a new C7
-repo gets, deployed at <https://lecture-demos.fly.dev/>. The static half's
-artefacts went out with the weeks they were built for.
+repo got. From Week 8 each lecture shows its web concept in a different
+mainstream framework, and from Week 9 the tree is that week's: a small message
+board in [Phoenix LiveView](https://www.phoenixframework.org/) (Elixir, with
+SQLite through Ecto), written for the lecture rather than vendored, deployed at
+<https://lecture-demos.fly.dev/>. The static half's artefacts went out with the
+weeks they were built for.
 
 ## Follow along
 
@@ -32,12 +36,15 @@ the projector's starting state:
 
 ```sh
 git fetch && git reset --hard origin/main
+mise install
 pnpm install
+pnpm setup
 pnpm dev
 ```
 
-`pnpm dev` keeps its database in `.data/` on your machine, so your copy starts
-empty and never touches the deployed one.
+`mise install` fetches the week's toolchain (Erlang and Elixir, from Week 9),
+and `pnpm setup` its dependencies. `pnpm dev` keeps its database in `.data/` on
+your machine, so your copy starts empty and never touches the deployed one.
 
 ## Check-ins
 
@@ -56,7 +63,7 @@ different with it.
 Keep anything you want to retain on your own branch or worktree before the next
 lecture's reset.
 
-The demo runs the same checks as the student starter: `pnpm check` covers the
-typecheck, the build and the tests. The stack underneath is whatever the current
-artefact brought with it — at the baseline, that is the starter's own: Astro on
-Node, with SQLite through Drizzle.
+`pnpm check` covers the compile, the build and the tests, whatever the stack:
+the artefact's own tests (`mix test`, from Week 9), then the invariants in
+`spec/` against the built app. The stack underneath is whatever the current
+artefact brought with it.

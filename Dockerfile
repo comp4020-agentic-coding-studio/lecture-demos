@@ -1,45 +1,95 @@
 # syntax = docker/dockerfile:1
 
-# The image Fly builds and runs: install, build, then keep only the built
-# server and its production dependencies.
+# The image Fly builds and runs: compile the app and its assets into an Elixir
+# release, then keep only the release. Based on `mix phx.gen.release --docker`.
 
-# NODE_VERSION and PNPM_VERSION mirror mise.toml, which Docker cannot read:
+# ELIXIR_VERSION and OTP_VERSION mirror mise.toml, which Docker cannot read:
 # bump them together
-ARG NODE_VERSION=24.21.0
-FROM node:${NODE_VERSION}-slim AS base
+ARG ELIXIR_VERSION=1.19.5
+ARG OTP_VERSION=28.5.0.3
+ARG DEBIAN_VERSION=trixie-20260713-slim
 
-LABEL fly_launch_runtime="Astro"
+ARG BUILDER_IMAGE="docker.io/hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+ARG RUNNER_IMAGE="docker.io/debian:${DEBIAN_VERSION}"
 
+FROM ${BUILDER_IMAGE} AS builder
+
+# install build dependencies
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends build-essential git \
+  && rm -rf /var/lib/apt/lists/*
+
+# prepare build dir
 WORKDIR /app
-ENV NODE_ENV=production
 
-ARG PNPM_VERSION=11.9.0
-RUN npm install -g pnpm@$PNPM_VERSION
+# install hex + rebar
+RUN mix local.hex --force \
+  && mix local.rebar --force
 
-# --- build stage: install everything, build, then prune to prod deps -------
-FROM base AS build
+# set build ENV
+ENV MIX_ENV="prod"
 
-# toolchain for native modules (better-sqlite3), in case no prebuilt binary
-# matches the image platform
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential pkg-config python-is-python3
+# install mix dependencies
+COPY mix.exs mix.lock ./
+RUN mix deps.get --only $MIX_ENV
+RUN mkdir config
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile --prod=false
+# copy compile-time config files before we compile dependencies
+# to ensure any relevant config change will trigger the dependencies
+# to be re-compiled.
+COPY config/config.exs config/${MIX_ENV}.exs config/
+RUN mix deps.compile
 
-COPY . .
-RUN pnpm run build
-RUN pnpm prune --prod
+RUN mix assets.setup
 
-# --- runtime stage: just the built server and its production deps ----------
-FROM base
+COPY priv priv
 
-COPY --from=build /app/node_modules /app/node_modules
-COPY --from=build /app/dist /app/dist
-# the committed migrations, applied at boot (see src/lib/db.ts)
-COPY --from=build /app/drizzle /app/drizzle
+COPY lib lib
+# the /readme/ page renders README.md at compile time
+COPY README.md ./
 
-ENV HOST=0.0.0.0
+# Compile the release
+RUN mix compile
+
+COPY assets assets
+
+# compile assets
+RUN mix assets.deploy
+
+# Changes to config/runtime.exs don't require recompiling the code
+COPY config/runtime.exs config/
+
+COPY rel rel
+RUN mix release
+
+# start a new build stage so that the final image will only contain
+# the compiled release and other runtime necessities
+FROM ${RUNNER_IMAGE} AS final
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends libstdc++6 openssl libncurses6 locales ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+# Set the locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
+  && locale-gen
+
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+WORKDIR "/app"
+
+# set runner ENV
+ENV MIX_ENV="prod"
+
+# Only copy the final release from the build stage
+COPY --from=builder /app/_build/${MIX_ENV}/rel/lecture_demos ./
+
+# no `USER nobody`: Fly mounts the /data volume owned by root, and the SQLite
+# file lives there
+
+# fly.toml's internal_port; migrations run at boot (lib/lecture_demos/application.ex)
 ENV PORT=4321
 EXPOSE 4321
-CMD ["node", "./dist/server/entry.mjs"]
+CMD ["/app/bin/server"]

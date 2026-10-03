@@ -3,9 +3,13 @@
 # it, node_modules and your local database ship to the builder.
 .git
 node_modules
-dist
-.astro
+_build
+deps
+priv/static/assets
+priv/static/cache_manifest.json
 .data
+*.db
+*.db-*
 *.log
 .env
 .env.*
