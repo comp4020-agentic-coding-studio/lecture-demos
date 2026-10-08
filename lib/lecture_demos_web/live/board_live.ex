@@ -101,8 +101,12 @@ defmodule LectureDemosWeb.BoardLive do
   end
 
   @impl true
+  # every tab hears the fanfare, the poster's own included
   def handle_info({:new_message, message}, socket) do
-    {:noreply, stream_insert(socket, :messages, message, at: 0)}
+    {:noreply,
+     socket
+     |> stream_insert(:messages, message, at: 0)
+     |> push_event("fanfare", %{})}
   end
 
   # an existing id is updated in place, so the thread grows where it sits
@@ -115,6 +119,87 @@ defmodule LectureDemosWeb.BoardLive do
     ~H"""
     <Layouts.app flash={@flash}>
       <h1 class="text-2xl font-semibold">Board</h1>
+
+      <div id="fanfare" phx-hook=".Fanfare" hidden></div>
+      <script :type={Phoenix.LiveView.ColocatedHook} name=".Fanfare">
+        // a bugle call on brass-ish synth voices: two detuned sawtooths per note
+        // through a lowpass that opens on the attack, with a little vibrato
+        const CALL = [
+          [392.0, 0.0, 0.12], // G4
+          [523.25, 0.14, 0.12], // C5
+          [659.25, 0.28, 0.12], // E5
+          [783.99, 0.42, 0.22], // G5
+          [659.25, 0.66, 0.12], // E5
+          [783.99, 0.8, 0.7], // G5, held
+        ]
+
+        function note(ctx, out, freq, start, length) {
+          const t = ctx.currentTime + start
+          const filter = ctx.createBiquadFilter()
+          filter.type = "lowpass"
+          filter.Q.value = 2
+          filter.frequency.setValueAtTime(freq * 1.5, t)
+          filter.frequency.linearRampToValueAtTime(freq * 6, t + 0.05)
+          filter.frequency.exponentialRampToValueAtTime(freq * 3, t + length)
+
+          const gain = ctx.createGain()
+          gain.gain.setValueAtTime(0.0001, t)
+          gain.gain.exponentialRampToValueAtTime(0.25, t + 0.03)
+          gain.gain.setValueAtTime(0.2, t + length)
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + length + 0.08)
+
+          const vibrato = ctx.createOscillator()
+          const depth = ctx.createGain()
+          vibrato.frequency.value = 5.5
+          depth.gain.value = length > 0.3 ? freq * 0.008 : 0
+
+          vibrato.connect(depth)
+          filter.connect(gain).connect(out)
+
+          for (const detune of [-6, 6]) {
+            const osc = ctx.createOscillator()
+            osc.type = "sawtooth"
+            osc.detune.value = detune
+            // brass players scoop up into the note
+            osc.frequency.setValueAtTime(freq * 0.97, t)
+            osc.frequency.linearRampToValueAtTime(freq, t + 0.04)
+            depth.connect(osc.frequency)
+            osc.connect(filter)
+            osc.start(t)
+            osc.stop(t + length + 0.1)
+          }
+          vibrato.start(t)
+          vibrato.stop(t + length + 0.1)
+        }
+
+        export default {
+          mounted() {
+            // browsers keep audio muted until the page has been interacted with,
+            // so the context is made (or woken) on the first click or keypress
+            this.unlock = () => {
+              this.ctx ||= new AudioContext()
+              this.ctx.resume()
+            }
+            for (const type of ["pointerdown", "keydown"]) {
+              window.addEventListener(type, this.unlock, {once: true})
+            }
+
+            this.handleEvent("fanfare", () => {
+              if (!this.ctx || this.ctx.state !== "running") return
+              const out = this.ctx.createGain()
+              out.gain.value = 0.6
+              out.connect(this.ctx.destination)
+              for (const [freq, start, length] of CALL) note(this.ctx, out, freq, start, length)
+            })
+          },
+          destroyed() {
+            for (const type of ["pointerdown", "keydown"]) {
+              window.removeEventListener(type, this.unlock)
+            }
+            this.ctx?.close()
+          },
+        }
+      </script>
 
       <.form for={@form} id="message-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:body]} type="textarea" label="Message" />
