@@ -16,7 +16,19 @@ defmodule LectureDemos.Board do
   def subscribe, do: Phoenix.PubSub.subscribe(LectureDemos.PubSub, @topic)
 
   def list_messages(limit \\ 50) do
-    Repo.all(from m in Message, order_by: [desc: m.id], limit: ^limit)
+    Repo.all(
+      from m in Message,
+        where: is_nil(m.parent_id),
+        order_by: [desc: m.id],
+        limit: ^limit,
+        preload: [replies: ^replies_query()]
+    )
+  end
+
+  defp replies_query, do: from(r in Message, order_by: r.id)
+
+  def change_reply(attrs \\ %{}) do
+    Message.reply_changeset(%Message{}, attrs)
   end
 
   def change_message(message \\ %Message{}, attrs \\ %{}) do
@@ -25,8 +37,22 @@ defmodule LectureDemos.Board do
 
   def create_message(attrs) do
     with {:ok, message} <- %Message{} |> Message.changeset(attrs) |> Repo.insert() do
+      message = %{message | replies: []}
       Phoenix.PubSub.broadcast(LectureDemos.PubSub, @topic, {:new_message, message})
       {:ok, message}
+    end
+  end
+
+  def create_reply(parent_id, attrs) do
+    # replies are one level deep: the parent must itself be a top-level message
+    parent = Repo.one!(from m in Message, where: m.id == ^parent_id and is_nil(m.parent_id))
+
+    with {:ok, _reply} <-
+           %Message{parent_id: parent.id} |> Message.reply_changeset(attrs) |> Repo.insert() do
+      # the whole thread is re-sent: the parent with its replies, in order
+      parent = Repo.preload(parent, [replies: replies_query()], force: true)
+      Phoenix.PubSub.broadcast(LectureDemos.PubSub, @topic, {:updated_message, parent})
+      {:ok, parent}
     end
   end
 end
