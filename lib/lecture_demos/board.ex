@@ -25,6 +25,14 @@ defmodule LectureDemos.Board do
     )
   end
 
+  def get_message!(id) do
+    Repo.one!(
+      from m in Message,
+        where: m.id == ^id and is_nil(m.parent_id),
+        preload: [replies: ^replies_query()]
+    )
+  end
+
   defp replies_query, do: from(r in Message, order_by: r.id)
 
   def change_reply(attrs \\ %{}) do

@@ -38,19 +38,28 @@ defmodule LectureDemosWeb.BoardLive do
   end
 
   def handle_event("reply_to", %{"id" => id}, socket) do
+    previous = socket.assigns.reply_to
+
     {:noreply,
      socket
      |> assign(:reply_to, String.to_integer(id))
-     |> assign(:reply_form, to_form(Board.change_reply(), as: :reply))}
+     |> assign(:reply_form, to_form(Board.change_reply(), as: :reply))
+     |> redraw(previous)
+     |> redraw(String.to_integer(id))}
   end
 
   def handle_event("cancel_reply", _params, socket) do
-    {:noreply, assign(socket, :reply_to, nil)}
+    previous = socket.assigns.reply_to
+    {:noreply, socket |> assign(:reply_to, nil) |> redraw(previous)}
   end
 
   def handle_event("reply_validate", %{"reply" => params}, socket) do
     changeset = Board.change_reply(params)
-    {:noreply, assign(socket, :reply_form, to_form(changeset, as: :reply, action: :validate))}
+
+    {:noreply,
+     socket
+     |> assign(:reply_form, to_form(changeset, as: :reply, action: :validate))
+     |> redraw(socket.assigns.reply_to)}
   end
 
   # a palette button: append the emoji to whatever has been typed so far
@@ -60,7 +69,10 @@ defmodule LectureDemosWeb.BoardLive do
       "gif_url" => socket.assigns.reply_form[:gif_url].value
     }
 
-    {:noreply, assign(socket, :reply_form, to_form(Board.change_reply(params), as: :reply))}
+    {:noreply,
+     socket
+     |> assign(:reply_form, to_form(Board.change_reply(params), as: :reply))
+     |> redraw(socket.assigns.reply_to)}
   end
 
   def handle_event("reply_save", %{"reply" => params}, socket) do
@@ -73,8 +85,19 @@ defmodule LectureDemosWeb.BoardLive do
          |> assign(:reply_form, to_form(Board.change_reply(), as: :reply))}
 
       {:error, changeset} ->
-        {:noreply, assign(socket, :reply_form, to_form(changeset, as: :reply, action: :insert))}
+        {:noreply,
+         socket
+         |> assign(:reply_form, to_form(changeset, as: :reply, action: :insert))
+         |> redraw(socket.assigns.reply_to)}
     end
+  end
+
+  # messages are a stream, so the server keeps no copy of them: a message whose
+  # reply form opens, closes or changes has to be re-sent to be redrawn
+  defp redraw(socket, nil), do: socket
+
+  defp redraw(socket, id) do
+    stream_insert(socket, :messages, Board.get_message!(id))
   end
 
   @impl true
