@@ -30,7 +30,6 @@ jobs:
         with:
           cache: true
       - run: pnpm install --frozen-lockfile
-      - run: mix local.hex --force && mix local.rebar --force && mix deps.get
       - name: Build and run the spec
         run: pnpm check
       - name: Scan for committed secrets
@@ -55,7 +54,7 @@ jobs:
     # Deliberately not `needs: check`. A red check is teaching material in this
     # repo, and a demo beat pushed red should still reach the live app rather
     # than leave the last green build serving under this week's URL. The
-    # Dockerfile runs its own `mix release`: an app that cannot build still
+    # Dockerfile runs its own `pnpm build`: an app that cannot build still
     # cannot ship.
     if: ${{ !github.event.repository.private && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
@@ -87,37 +86,30 @@ jobs:
             sleep 10
           done
           echo "site did not return 200"; exit 1
-      - name: Verify the LiveView socket upgrades
-        # a page's live half runs over a WebSocket at /live/websocket; a
-        # same-origin upgrade is answered 101 Switching Protocols. --http1.1
-        # because the upgrade is an HTTP/1.1 mechanism: over Fly's TLS, curl
-        # would otherwise negotiate HTTP/2 and get a 400
+      - name: Verify a room's event stream opens
+        # real-time runs over server-sent events: a room's /events response
+        # is text/event-stream and stays open, so curl's timeout ends it
         run: |
-          code=$(curl --http1.1 -s -o /dev/null -w "%{http_code}" -m 15 \
-            -H "Connection: Upgrade" -H "Upgrade: websocket" \
-            -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
-            -H "Origin: $APP_URL" "$APP_URL/live/websocket?vsn=2.0.0" || true)
-          if [ "$code" = "101" ]; then
-            echo "upgraded: $APP_URL/live/websocket"
+          type=$(curl -s -o /dev/null -w "%{content_type}" -m 5 "$APP_URL/rooms/1/events" || true)
+          if [ "$type" = "text/event-stream" ]; then
+            echo "streaming: $APP_URL/rooms/1/events"
           else
-            echo "the LiveView socket did not upgrade (HTTP $code). If it is 403,"
-            echo "the app thinks it is serving some other host: check PHX_HOST"
-            echo "and FLY_APP_NAME in config/runtime.exs."
+            echo "the event stream did not open (content-type: '$type')"
             exit 1
           fi
-      - name: Verify cross-site sockets are refused
-        # Phoenix's check_origin: a WebSocket opened from a foreign Origin must
-        # be refused, or any site could act as a visitor here.
+      - name: Verify cross-site form posts are refused
+        # SvelteKit's CSRF check: a form POST from a foreign Origin must be
+        # refused, or any site could act as a signed-in visitor here.
         run: |
-          code=$(curl --http1.1 -s -o /dev/null -w "%{http_code}" -m 15 \
-            -H "Connection: Upgrade" -H "Upgrade: websocket" \
-            -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
-            -H "Origin: https://cross-site.example.com" "$APP_URL/live/websocket?vsn=2.0.0" || true)
+          code=$(curl -s -o /dev/null -w "%{http_code}" -m 15 -X POST \
+            -H "Origin: https://cross-site.example.com" -H "Accept: text/html" \
+            -H "Content-Type: application/x-www-form-urlencoded" --data "x=1" \
+            "$APP_URL/login?/signIn" || true)
           if [ "$code" = "403" ]; then
-            echo "cross-site socket refused: check_origin is on"
+            echo "cross-site form post refused: CSRF check is on"
           else
-            echo "a cross-site WebSocket was NOT refused (HTTP $code). Did"
-            echo "check_origin get set to false for prod?"
+            echo "a cross-site form POST was NOT refused (HTTP $code). Did"
+            echo "SvelteKit's CSRF check get turned off?"
             exit 1
           fi
       - name: Check internal links on the live site

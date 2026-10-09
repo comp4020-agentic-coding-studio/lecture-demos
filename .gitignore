@@ -1,14 +1,9 @@
 node_modules/
 *.log
 
-# Elixir build output, fetched deps, and the assets the build writes
-/_build/
-/deps/
-/priv/static/assets/
-/priv/static/cache_manifest.json
-/priv/static/*-*.*
-/priv/static/*.gz
-erl_crash.dump
+# SvelteKit's generated files and the production build
+/.svelte-kit/
+/build/
 
 # editor and OS junk
 .DS_Store

@@ -3,10 +3,8 @@
 # it, node_modules and your local database ship to the builder.
 .git
 node_modules
-_build
-deps
-priv/static/assets
-priv/static/cache_manifest.json
+.svelte-kit
+build
 .data
 *.db
 *.db-*

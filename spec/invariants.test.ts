@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, inject, it } from "vitest";
 import { ROUTES } from "./routes";
 
 // The invariants run against the RUNNING app — spec/global-setup.ts boots the
-// built server (dist/server/entry.mjs, the same artefact production runs) and
+// built server (build/index.js, the same artefact production runs) and
 // these tests fetch each route over HTTP. So they check what actually ships,
 // not the source; `pnpm test` builds first.
 //

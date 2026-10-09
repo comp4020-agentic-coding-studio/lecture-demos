@@ -1,0 +1,94 @@
+:root {
+	color-scheme: light dark;
+	font-family: system-ui, sans-serif;
+	line-height: 1.5;
+	--accent: #be830e;
+	--muted: color-mix(in oklab, currentColor 60%, transparent);
+	--line: color-mix(in oklab, currentColor 20%, transparent);
+}
+
+body {
+	margin: 0;
+}
+
+header,
+main {
+	max-inline-size: 48rem;
+	margin-inline: auto;
+	padding-inline: 1rem;
+}
+
+header nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+	padding-block: 1rem;
+	border-block-end: 1px solid var(--line);
+}
+
+header nav .who {
+	margin-inline-start: auto;
+	color: var(--muted);
+}
+
+a {
+	color: var(--accent);
+}
+
+form.inline {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'] {
+	font: inherit;
+	padding: 0.4rem 0.6rem;
+	border: 1px solid var(--line);
+	border-radius: 0.3rem;
+	min-inline-size: 0;
+	flex: 1;
+}
+
+button {
+	font: inherit;
+	padding: 0.4rem 0.8rem;
+	border: 1px solid var(--accent);
+	border-radius: 0.3rem;
+	background: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+ul.cards,
+ul.rooms {
+	list-style: none;
+	padding: 0;
+}
+
+ul.cards li,
+ul.rooms li {
+	padding-block: 0.6rem;
+	border-block-end: 1px solid var(--line);
+}
+
+.meta {
+	font-size: 0.85em;
+	color: var(--muted);
+}
+
+.error {
+	color: #c0392b;
+}
+
+.visually-hidden {
+	position: absolute;
+	inline-size: 1px;
+	block-size: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}

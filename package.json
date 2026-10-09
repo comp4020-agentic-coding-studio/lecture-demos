@@ -1,23 +1,44 @@
 {
   "name": "comp4020-lecture-demos",
   "private": true,
+  "type": "module",
   "scripts": {
-    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
-    "setup": "mix setup",
-    "dev": "mix phx.server",
-    "build": "mix release.build",
-    "typecheck": "mix compile --warnings-as-errors",
+    "prepare": "(git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true) && (svelte-kit sync || true)",
+    "dev": "vite dev --port 4321",
+    "build": "vite build",
+    "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
     "check": "pnpm typecheck && pnpm test",
-    "test": "mix test && pnpm build && vitest run"
+    "test": "pnpm build && vitest run",
+    "db:generate": "drizzle-kit generate"
   },
-  "devDependencies": {
-    "@types/jsdom": "^30.0.0",
-    "axe-core": "^4.13.0",
-    "jsdom": "^30.1.0",
-    "marked": "^18.0.0",
-    "vitest": "^5.0.1"
+  "imports": {
+    "#lib": "./src/lib/index.js",
+    "#lib/*": "./src/lib/*"
   },
   "engines": {
     "pnpm": ">=11"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "^6.0.0",
+    "@sveltejs/kit": "^3.0.1",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^24.19.1",
+    "auth": "^1.7.7",
+    "axe-core": "^4.14.0",
+    "better-auth": "^1.7.7",
+    "drizzle-kit": "^0.31.11",
+    "drizzle-orm": "^0.45.3",
+    "jsdom": "^30.1.2",
+    "marked": "^18.1.0",
+    "svelte": "^5.57.2",
+    "svelte-check": "^4.7.6",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.3",
+    "vitest": "^5.0.3"
   }
 }

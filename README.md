@@ -23,11 +23,16 @@ From Week 7 the tree is the course's full-stack starter,
 [template-dynamic](https://github.com/comp4020-agentic-coding-studio/template-dynamic)
 at `5e2c1b1`, plus this repo's own harness on top: the same guestbook a new C7
 repo got. From Week 8 each lecture shows its web concept in a different
-mainstream framework, and from Week 9 the tree is that week's: a small message
-board in [Phoenix LiveView](https://www.phoenixframework.org/) (Elixir, with
-SQLite through Ecto), written for the lecture rather than vendored, deployed at
-<https://lecture-demos.fly.dev/>. The static half's artefacts went out with the
-weeks they were built for.
+mainstream framework, and from Week 9 the tree is that week's, written for the
+lecture rather than vendored. Week 9's was a message board in Phoenix LiveView;
+from Week 10 it is a set of shared rooms of cards in
+[SvelteKit](https://svelte.dev/docs/kit), deployed at
+<https://lecture-demos.fly.dev/>: sign-in with
+[better-auth](https://www.better-auth.com/), SQLite through
+[Drizzle](https://orm.drizzle.team/), and server-sent events so everyone in a
+room sees each change. Every request, and every thing a person does, writes one
+line to the log that `fly logs` shows. The static half's artefacts went out with
+the weeks they were built for.
 
 ## Follow along
 
@@ -38,13 +43,13 @@ the projector's starting state:
 git fetch && git reset --hard origin/main
 mise install
 pnpm install
-pnpm setup
 pnpm dev
 ```
 
-`mise install` fetches the week's toolchain (Erlang and Elixir, from Week 9),
-and `pnpm setup` its dependencies. `pnpm dev` keeps its database in `.data/` on
-your machine, so your copy starts empty and never touches the deployed one.
+`mise install` fetches the week's toolchain (Node and pnpm, from Week 10), and
+`pnpm install` its dependencies. `pnpm dev` serves the app at
+<http://localhost:4321> and keeps its database in `.data/` on your machine, so
+your copy starts empty and never touches the deployed one.
 
 ## Check-ins
 
@@ -64,6 +69,6 @@ Keep anything you want to retain on your own branch or worktree before the next
 lecture's reset.
 
 `pnpm check` covers the compile, the build and the tests, whatever the stack:
-the artefact's own tests (`mix test`, from Week 9), then the invariants in
-`spec/` against the built app. The stack underneath is whatever the current
-artefact brought with it.
+the artefact's own tests (`test/`), then the invariants in `spec/`, both against
+the built app. The stack underneath is whatever the current artefact brought
+with it.

@@ -1,4 +1,7 @@
-# esbuild (used by Vite, under vitest) needs its postinstall to set up its
-# native binary
+# Which packages' install scripts run. esbuild (used by Vite) needs its
+# postinstall to set up its native binary. better-sqlite3 ships prebuilt
+# binaries, so its implied node-gyp rebuild is skipped: that would need a C
+# toolchain and gains nothing.
 allowBuilds:
   esbuild: true
+  better-sqlite3: false

@@ -11,11 +11,11 @@ declare module "vitest" {
   }
 }
 
-// Boot the BUILT release (the same artefact the Dockerfile runs) on a free
+// Boot the BUILT server (the same artefact the Dockerfile runs) on a free
 // port with a throwaway database, so the spec asserts what actually ships —
 // not the dev server, and never your local data.
 export default async function setup(project: TestProject): Promise<() => void> {
-  const server = "./_build/prod/rel/lecture_demos/bin/server";
+  const server = "./build/index.js";
   if (!existsSync(server)) {
     throw new Error(`${server} not found — run \`pnpm test\`, which builds first`);
   }
@@ -28,21 +28,22 @@ export default async function setup(project: TestProject): Promise<() => void> {
     });
   });
 
-  // detached, so the whole process group (the script and the VM it starts) can
-  // be stopped at the end; no distribution, so runs never clash over a node name
-  const release = spawn(server, [], {
+  // detached, so the whole process group can be stopped at the end
+  const app = spawn(process.execPath, [server], {
     env: {
       ...process.env,
       PORT: String(port),
-      PHX_HOST: "127.0.0.1",
-      RELEASE_DISTRIBUTION: "none",
+      ORIGIN: `http://127.0.0.1:${port}`,
+      // adapter-node assumes https (on Fly, TLS ends at the proxy); this server
+      // is plain http, so a POST says so in the header a proxy would set
+      PROTOCOL_HEADER: "x-forwarded-proto",
       DATABASE_PATH: join(mkdtempSync(join(tmpdir(), "spec-db-")), "test.db"),
     },
     stdio: "ignore",
     detached: true,
   });
   const stop = () => {
-    if (release.pid) process.kill(-release.pid, "SIGTERM");
+    if (app.pid) process.kill(-app.pid, "SIGTERM");
   };
 
   const baseUrl = `http://127.0.0.1:${port}`;

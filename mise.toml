@@ -1,7 +1,4 @@
 [tools]
-erlang = "28.5.0.3"
-elixir = "1.19.5-otp-28"
-# node and pnpm run the spec in spec/
 node = "24.21.0"
 pnpm = "11.9.0"
 

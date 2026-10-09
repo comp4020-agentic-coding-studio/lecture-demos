@@ -20,8 +20,8 @@ you build it and whatever the week's brief asks: a navigation landmark, exactly
 one top-level heading, a document language, a real title, a mobile viewport, alt
 text on images — plus an automated **accessibility floor**: axe-core's rule set,
 run on each page's served HTML. They run against the **running** app —
-`global-setup.ts` boots the built release (`_build/prod/rel/`, the same artefact
-production runs) with a throwaway database — so they check what actually ships.
+`global-setup.ts` boots the built server (`build/`, the same artefact production
+runs) with a throwaway database — so they check what actually ships.
 Keep them green; don't delete them.
 
 Two things to know about how they see your app:
@@ -43,10 +43,11 @@ all of it, so styling and navigation around it pass and a trimmed copy fails.
 
 ## The artefact's own tests (retire with the artefact)
 
-The app's own tests live with its stack, not here: from Week 9 that's `test/`,
-run by `mix test`, where `Phoenix.LiveViewTest` proves the board's two platform
-claims — a message survives a reload, and one posted in one tab reaches another.
-They describe this artefact, so they go when it does.
+The app's own tests live with its stack, not here: from Week 10 that's `test/`,
+run by vitest against the same running server. Two people sign up; a card one of
+them adds reaches the other's open event stream and is still there on a fresh
+load, and the other can't delete it. They describe this artefact, so they go
+when it does.
 
 ## The week's spec tests (written live)
 
