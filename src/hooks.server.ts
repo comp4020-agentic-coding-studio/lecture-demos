@@ -3,17 +3,19 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { building } from "$app/env";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { auth } from "#lib/server/auth.ts";
+import { who } from "#lib/server/log.ts";
 
 // The request log: one line per request, written when the response is ready.
-//   [2b1f9c] GET /rooms/3 200 12ms user=Xk2…
+//   [eec129] GET /rooms/1 200 7ms user=bZDooYdk
 const handleLog: Handle = async ({ event, resolve }) => {
   const start = performance.now();
   event.locals.requestId = crypto.randomUUID().slice(0, 6);
   const response = await resolve(event);
   const ms = Math.round(performance.now() - start);
-  const user = event.locals.user?.id ?? "-";
+  const { method } = event.request;
+  const path = event.url.pathname + event.url.search;
   console.log(
-    `[${event.locals.requestId}] ${event.request.method} ${event.url.pathname} ${response.status} ${ms}ms user=${user}`,
+    `[${event.locals.requestId}] ${method} ${path} ${response.status} ${ms}ms user=${who(event)}`,
   );
   return response;
 };
